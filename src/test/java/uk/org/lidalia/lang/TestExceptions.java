@@ -25,10 +25,37 @@
 package uk.org.lidalia.lang;
 
 import static uk.org.lidalia.test.Assert.assertNotInstantiable;
+import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
+import static uk.org.lidalia.test.Assert.shouldThrow;
 
 import org.junit.Test;
 
+import java.util.concurrent.Callable;
+
 public class TestExceptions {
+
+    @Test
+    public void throwUncheckedWithCheckedException() throws Throwable {
+        final Exception checkedException = new Exception();
+        shouldThrow(checkedException, new Callable<Void>() {
+            @Override
+            public Void call() {
+                throwUnchecked(checkedException);
+                throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
+            }
+        });
+    }
+
+    @Test
+    public void throwUncheckedWithCheckedExceptionAndReturnStatementToTrickCompiler() throws Throwable {
+        final Exception checkedException = new Exception();
+        shouldThrow(checkedException, new Callable<Void>() {
+            @Override
+            public Void call() {
+                return throwUnchecked(checkedException, Void.class);
+            }
+        });
+    }
 
 	@Test
 	public void notInstantiable() throws Throwable {
