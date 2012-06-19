@@ -72,7 +72,7 @@ public class ThreadLocal<T> {
     }
 
     /**
-     * Removes the values for all {@link Thread}s.
+     * Removes the values for ALL {@link Thread}s.
      * Subsequent calls to {@link #get()} will return the initial value.
      */
     public void reset() {
