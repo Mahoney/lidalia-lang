@@ -4,7 +4,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
-import javax.annotation.Nullable;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -19,7 +18,7 @@ public class RichOptional<T> {
         return new RichOptional<T>(Optional.of(reference));
     }
 
-    public static <T> RichOptional<T> fromNullable(@Nullable T nullableReference) {
+    public static <T> RichOptional<T> fromNullable(T nullableReference) {
         return new RichOptional<T>(Optional.fromNullable(nullableReference));
     }
 
@@ -61,7 +60,6 @@ public class RichOptional<T> {
         return decorated.or(supplier);
     }
 
-    @Nullable
     public T orNull() {
         return decorated.orNull();
     }
