@@ -26,7 +26,7 @@ package uk.org.lidalia.lang;
 
 import static uk.org.lidalia.test.Assert.assertNotInstantiable;
 import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
-import static uk.org.lidalia.test.Assert.shouldThrow;
+import static uk.org.lidalia.test.ShouldThrow.shouldThrow;
 
 import org.junit.Test;
 
