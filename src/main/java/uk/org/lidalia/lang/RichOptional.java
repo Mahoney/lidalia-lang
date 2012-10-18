@@ -91,8 +91,12 @@ public class RichOptional<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof RichOptional)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RichOptional)) {
+            return false;
+        }
         RichOptional<?> that = (RichOptional<?>) o;
         return decorated.equals(that.decorated);
     }

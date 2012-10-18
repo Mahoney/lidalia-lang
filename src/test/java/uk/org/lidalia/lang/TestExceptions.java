@@ -36,7 +36,7 @@ public class TestExceptions {
 
     @Test
     public void throwUncheckedWithCheckedException() throws Throwable {
-        final Exception checkedException = new Exception();
+        final RichException checkedException = new RichException();
         shouldThrow(checkedException, new Runnable() {
             @Override
             public void run() {
@@ -47,7 +47,7 @@ public class TestExceptions {
 
     @Test
      public void throwUncheckedWithCheckedExceptionAndReturnStatementToTrickCompilerWithClass() throws Throwable {
-        final Exception checkedException = new Exception();
+        final RichException checkedException = new RichException();
         shouldThrow(checkedException, new Callable<Void>() {
             @Override
             public Void call() {
@@ -58,7 +58,7 @@ public class TestExceptions {
 
     @Test
     public void throwUncheckedWithCheckedExceptionAndReturnStatementToTrickCompilerWithNull() throws Throwable {
-        final Exception checkedException = new Exception();
+        final RichException checkedException = new RichException();
         shouldThrow(checkedException, new Callable<Void>() {
             @Override
             public Void call() {
@@ -67,8 +67,8 @@ public class TestExceptions {
         });
     }
 
-	@Test
-	public void notInstantiable() throws Throwable {
-		assertNotInstantiable(Exceptions.class);
-	}
+    @Test
+    public void notInstantiable() throws Throwable {
+        assertNotInstantiable(Exceptions.class);
+    }
 }

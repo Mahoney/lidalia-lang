@@ -60,12 +60,12 @@ public final class Exceptions {
      * @return Never returns, always throws the passed in exception
      */
     public static <T> T throwUnchecked(final Throwable ex, final Class<T> returnType) {
-        Exceptions.<RuntimeException>doThrowUnchecked(ex);
+        Exceptions.<RichRuntimeException>doThrowUnchecked(ex);
         throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
     }
 
     public static <T> T throwUnchecked(final Throwable ex, final T returnType) {
-        Exceptions.<RuntimeException>doThrowUnchecked(ex);
+        Exceptions.<RichRuntimeException>doThrowUnchecked(ex);
         throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
     }
 
@@ -77,18 +77,18 @@ public final class Exceptions {
     }
 
     @SuppressWarnings("unchecked")
-	private static <T extends Throwable> void doThrowUnchecked(Throwable toThrow) throws T {
+    private static <T extends Throwable> void doThrowUnchecked(Throwable toThrow) throws T {
         throw (T) toThrow;
     }
 
     static List<Throwable> buildUnmodifiableCauseList(Throwable cause, Throwable[] otherCauses) {
-		ArrayList<Throwable> causes = new ArrayList<Throwable>(otherCauses.length + 1);
-		causes.add(cause);
-		causes.addAll(Arrays.asList(otherCauses));
-		return Collections.unmodifiableList(causes);
-	}
+        ArrayList<Throwable> causes = new ArrayList<Throwable>(otherCauses.length + 1);
+        causes.add(cause);
+        causes.addAll(Arrays.asList(otherCauses));
+        return Collections.unmodifiableList(causes);
+    }
 
-	private Exceptions() {
-		throw new UnsupportedOperationException("Not instantiable");
-	}
+    private Exceptions() {
+        throw new UnsupportedOperationException("Not instantiable");
+    }
 }
