@@ -29,7 +29,7 @@ public class RichObject {
     private static final int INITIAL_HASHCODE_VALUE = 17;
 
     private static final LoadingCache<Class<? extends RichObject>, Set<Field>> IDENTITY_FIELDS =
-            CacheBuilder.newBuilder().softValues().build(new IdentityFieldLoader());
+            CacheBuilder.newBuilder().weakKeys().softValues().build(new IdentityFieldLoader());
     private static final Joiner FIELD_JOINER = Joiner.on(",");
 
     private static Set<Field> getIdentityFields(Class<? extends RichObject> aClass) {
