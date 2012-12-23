@@ -60,12 +60,12 @@ public final class Exceptions {
      * @return Never returns, always throws the passed in exception
      */
     public static <T> T throwUnchecked(final Throwable ex, final Class<T> returnType) {
-        Exceptions.<RichRuntimeException>doThrowUnchecked(ex);
+        Exceptions.<RuntimeException>doThrowUnchecked(ex);
         throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
     }
 
     public static <T> T throwUnchecked(final Throwable ex, final T returnType) {
-        Exceptions.<RichRuntimeException>doThrowUnchecked(ex);
+        Exceptions.<RuntimeException>doThrowUnchecked(ex);
         throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
     }
 
