@@ -2,12 +2,18 @@ package uk.org.lidalia.lang;
 
 import org.apache.commons.lang3.Validate;
 
+import static java.lang.Integer.parseInt;
+
 public class UnsignedByte extends RichObject {
 
     private static final int MAX_BYTE_VALUE = 255;
 
-    public static UnsignedByte from(int theByte) {
+    public static UnsignedByte UnsignedByte(int theByte) {
         return new UnsignedByte(theByte);
+    }
+
+    public static UnsignedByte UnsignedByte(String theByte) {
+        return UnsignedByte(parseInt(theByte));
     }
 
     @Identity private final int theByte;
