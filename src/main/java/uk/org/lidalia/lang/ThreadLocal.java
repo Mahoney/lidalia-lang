@@ -1,5 +1,6 @@
 package uk.org.lidalia.lang;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,7 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ThreadLocal<T> {
 
-    private final Map<Thread, T> contents = new ConcurrentHashMap<Thread, T>();
+    private final Map<Thread, T> contents = new ConcurrentHashMap<>();
     private final Supplier<T> initialValueCreator;
 
     /**
@@ -77,5 +78,9 @@ public class ThreadLocal<T> {
      */
     public void reset() {
         contents.clear();
+    }
+
+    public Collection<T> allValues() {
+        return contents.values();
     }
 }
