@@ -47,23 +47,12 @@ public class TestExceptions {
     }
 
     @Test
-     public void throwUncheckedWithCheckedExceptionAndReturnStatementToTrickCompilerWithClass() {
+     public void throwUncheckedWithCheckedExceptionAndReturnStatementToTrickCompiler() {
         final RichException checkedException = new RichException();
         shouldThrow(checkedException, new Callable<Void>() {
             @Override
             public Void call() {
-                return throwUnchecked(checkedException, Void.class);
-            }
-        });
-    }
-
-    @Test
-    public void throwUncheckedWithCheckedExceptionAndReturnStatementToTrickCompilerWithNull() {
-        final RichException checkedException = new RichException();
-        shouldThrow(checkedException, new Callable<Void>() {
-            @Override
-            public Void call() {
-                return throwUnchecked(checkedException, (Void) null);
+                return throwUnchecked(checkedException, null);
             }
         });
     }

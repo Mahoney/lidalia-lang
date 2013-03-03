@@ -5,6 +5,7 @@ import static com.google.common.collect.Iterables.transform;
 import static java.security.AccessController.doPrivileged;
 import static java.util.Arrays.asList;
 import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
+import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -19,8 +20,8 @@ import com.google.common.base.Predicate;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 public class RichObject {
@@ -28,7 +29,7 @@ public class RichObject {
     private static final int PRIME = 37;
     private static final int INITIAL_HASHCODE_VALUE = 17;
 
-    private static final LoadingCache<Class<? extends RichObject>, Set<Field>> IDENTITY_FIELDS =
+    private static final LoadingCache<Class<? extends RichObject>, ImmutableSet<Field>> IDENTITY_FIELDS =
             CacheBuilder.newBuilder().weakKeys().softValues().build(new IdentityFieldLoader());
     private static final Joiner FIELD_JOINER = Joiner.on(",");
 
@@ -36,8 +37,7 @@ public class RichObject {
         try {
             return IDENTITY_FIELDS.get(aClass);
         } catch (ExecutionException e) {
-            Exceptions.throwUnchecked(e.getCause());
-            throw new AssertionError("Unreachable code");
+            return throwUnchecked(e.getCause(), null);
         }
     }
 
@@ -144,20 +144,17 @@ public class RichObject {
     }
 
     public boolean instanceOf(Class<?> possibleSuperType) {
-        return Classes.instanceOf(this, possibleSuperType);
+        return possibleSuperType.isInstance(this);
     }
 
-    private static class IdentityFieldLoader extends CacheLoader<Class<?>, Set<Field>> {
+    private static class IdentityFieldLoader extends CacheLoader<Class<?>, ImmutableSet<Field>> {
         @Override
-        public Set<Field> load(Class<?> key) throws RichException {
-            if (key == RichObject.class) {
-                return ImmutableSet.of();
-            } else {
-                Iterable<Field> localIdentityFields = Iterables.filter(asList(key.getDeclaredFields()), new IsIdentityField());
-                final ImmutableSet<Field> localIdentityFieldSet = ImmutableSet.copyOf(localIdentityFields);
-                final Set<Field> superIdentityFieldSet = load(key.getSuperclass());
-                return Sets.union(localIdentityFieldSet, superIdentityFieldSet);
-            }
+        public ImmutableSet<Field> load(Class<?> key) throws RichException {
+            final ImmutableSet<Field> localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))
+                    .filter(new IsIdentityField())
+                    .toImmutableSet();
+            final ImmutableSet<Field> superIdentityFieldSet = load(key.getSuperclass());
+            return ImmutableSet.copyOf(Sets.union(localIdentityFieldSet, superIdentityFieldSet));
         }
 
         private static class IsIdentityField implements Predicate<Field> {

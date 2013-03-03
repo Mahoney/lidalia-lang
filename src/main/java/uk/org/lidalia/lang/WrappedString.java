@@ -1,6 +1,6 @@
 package uk.org.lidalia.lang;
 
-public abstract class WrappedString extends WrappedValue<String> implements Immutable {
+public abstract class WrappedString<T extends WrappedString<T>> extends WrappedValue<String> implements Immutable<T> {
 
     public WrappedString(String wrappedValue) {
         super(wrappedValue);
@@ -12,8 +12,8 @@ public abstract class WrappedString extends WrappedValue<String> implements Immu
     }
 
     @Override
-    public WrappedString toImmutable() {
-        return this;
+    public T toImmutable() {
+        return (T) this;
     }
 
 }

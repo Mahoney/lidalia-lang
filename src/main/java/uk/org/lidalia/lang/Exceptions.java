@@ -51,19 +51,14 @@ public final class Exceptions {
      *         try {
      *             somethingThatThrowsException();
      *         } catch (Exception e) {
-     *             return throwUnchecked(e, String.class); // does not actually return, throws the exception
+     *             return throwUnchecked(e, null); // does not actually return, throws the exception
      *         }
      *     }
      * </pre>
      * @param ex The exception that will be thrown, unwrapped and unchecked
-     * @param returnType trick to persuade the compiler that a method returns appropriately
+     * @param returnType trick to persuade the compiler that a method returns appropriately - always pass null here
      * @return Never returns, always throws the passed in exception
      */
-    public static <T> T throwUnchecked(final Throwable ex, final Class<T> returnType) {
-        Exceptions.<RuntimeException>doThrowUnchecked(ex);
-        throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
-    }
-
     public static <T> T throwUnchecked(final Throwable ex, final T returnType) {
         Exceptions.<RuntimeException>doThrowUnchecked(ex);
         throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
