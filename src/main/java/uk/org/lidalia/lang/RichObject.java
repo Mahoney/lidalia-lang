@@ -1,6 +1,7 @@
 package uk.org.lidalia.lang;
 
 import static com.google.common.base.Objects.equal;
+import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.collect.Iterables.transform;
 import static java.security.AccessController.doPrivileged;
 import static java.util.Arrays.asList;
@@ -16,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -148,12 +150,25 @@ public class RichObject {
     }
 
     private static class IdentityFieldLoader extends CacheLoader<Class<?>, ImmutableSet<Field>> {
+
+        private static final IsIdentityField IS_IDENTITY_FIELD = new IsIdentityField();
+
         @Override
         public ImmutableSet<Field> load(Class<?> key) throws RichException {
             final ImmutableSet<Field> localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))
-                    .filter(new IsIdentityField())
+                    .filter(IS_IDENTITY_FIELD)
                     .toImmutableSet();
-            final ImmutableSet<Field> superIdentityFieldSet = load(key.getSuperclass());
+            final Optional<? extends Class<?>> superClass = fromNullable(key.getSuperclass());
+            final ImmutableSet<Field> superIdentityFieldSet = superClass.transform(new Function<Class<?>, ImmutableSet<Field>>() {
+                @Override
+                public ImmutableSet<Field> apply(Class<?> input) {
+                    try {
+                        return load(input);
+                    } catch (RichException e) {
+                        return Exceptions.throwUnchecked(e, null);
+                    }
+                }
+            }).or(ImmutableSet.<Field>of());
             return ImmutableSet.copyOf(Sets.union(localIdentityFieldSet, superIdentityFieldSet));
         }
 
