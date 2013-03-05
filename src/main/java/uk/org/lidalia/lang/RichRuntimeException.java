@@ -3,30 +3,32 @@ package uk.org.lidalia.lang;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
 public class RichRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private final List<Throwable> causes;
+    private final ImmutableList<Throwable> causes;
 
     public RichRuntimeException() {
         super();
-        this.causes = Collections.emptyList();
+        this.causes = ImmutableList.of();
     }
 
     public RichRuntimeException(String message) {
         super(message);
-        this.causes = Collections.emptyList();
+        this.causes = ImmutableList.of();
     }
 
     public RichRuntimeException(Throwable cause, Throwable... otherCauses) {
         super(cause);
-        this.causes = Exceptions.buildUnmodifiableCauseList(cause, otherCauses);
+        this.causes = ImmutableList.<Throwable>builder().add(cause).add(otherCauses).build();
     }
 
     public RichRuntimeException(String message, Throwable cause, Throwable... otherCauses) {
         super(message, cause);
-        this.causes = Exceptions.buildUnmodifiableCauseList(cause, otherCauses);
+        this.causes = ImmutableList.<Throwable>builder().add(cause).add(otherCauses).build();
     }
 
     public List<Throwable> getCauses() {

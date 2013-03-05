@@ -1,41 +1,42 @@
 package uk.org.lidalia.lang;
 
-import java.util.Collections;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
+
+import static uk.org.lidalia.lang.Exceptions.throwableToString;
 
 public class RichException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private final List<Throwable> causes;
+    private final ImmutableList<Throwable> causes;
 
     public RichException() {
-        super();
-        this.causes = Collections.emptyList();
+        super("");
+        this.causes = ImmutableList.of();
     }
 
     public RichException(String message) {
         super(message);
-        this.causes = Collections.emptyList();
+        this.causes = ImmutableList.of();
     }
 
     public RichException(Throwable cause, Throwable... otherCauses) {
         super(cause);
-        this.causes = Exceptions.buildUnmodifiableCauseList(cause, otherCauses);
+        this.causes = ImmutableList.<Throwable>builder().add(cause).add(otherCauses).build();
     }
 
     public RichException(String message, Throwable cause, Throwable... otherCauses) {
         super(message, cause);
-        this.causes = Exceptions.buildUnmodifiableCauseList(cause, otherCauses);
+        this.causes = ImmutableList.<Throwable>builder().add(cause).add(otherCauses).build();
     }
 
-    public List<Throwable> getCauses() {
+    public ImmutableList<Throwable> getCauses() {
         return causes;
     }
 
     @Override
     public String toString() {
-        return Exceptions.throwableToString(super.toString(), causes);
+        return throwableToString(super.toString(), causes);
     }
 
     public boolean instanceOf(Class<?> possibleSuperType) {

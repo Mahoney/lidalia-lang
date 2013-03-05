@@ -154,7 +154,7 @@ public class RichObject {
         private static final IsIdentityField IS_IDENTITY_FIELD = new IsIdentityField();
 
         @Override
-        public ImmutableSet<Field> load(Class<?> key) throws RichException {
+        public ImmutableSet<Field> load(Class<?> key) {
             final ImmutableSet<Field> localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))
                     .filter(IS_IDENTITY_FIELD)
                     .toImmutableSet();
@@ -164,8 +164,8 @@ public class RichObject {
                 public ImmutableSet<Field> apply(Class<?> input) {
                     try {
                         return load(input);
-                    } catch (RichException e) {
-                        return Exceptions.throwUnchecked(e, null);
+                    } catch (Exception e) {
+                        return throwUnchecked(e, null);
                     }
                 }
             }).or(ImmutableSet.<Field>of());

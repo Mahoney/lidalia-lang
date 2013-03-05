@@ -24,22 +24,17 @@
 
 package uk.org.lidalia.lang;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.repeat;
+import static java.lang.System.lineSeparator;
 
 public final class Exceptions {
-
-    public static String throwableToString(String baseToString, List<Throwable> causes) {
-        if (causes.isEmpty()) {
-            return baseToString;
-        } else {
-            StringBuilder stringValue = new StringBuilder(baseToString);
-            stringValue.append("; caused by: ").append(causes);
-            return stringValue.toString();
-        }
-    }
 
     /**
      * Because this method throws an unchecked exception, when it is called in a method with a return type the compiler
@@ -55,17 +50,19 @@ public final class Exceptions {
      *         }
      *     }
      * </pre>
-     * @param ex The exception that will be thrown, unwrapped and unchecked
+     * @param ex The exception that will be thrown, unwrapped and unchecked; must not be null
      * @param returnType trick to persuade the compiler that a method returns appropriately - always pass null here
      * @return Never returns, always throws the passed in exception
+     * @throws NullPointerException if ex is null
      */
     public static <T> T throwUnchecked(final Throwable ex, final T returnType) {
-        Exceptions.<RuntimeException>doThrowUnchecked(ex);
+        Exceptions.<RuntimeException>doThrowUnchecked(checkNotNull(ex));
         throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
     }
 
     /**
-     * @param ex The exception that will be thrown, unwrapped and unchecked
+     * @param ex The exception that will be thrown, unwrapped and unchecked; must not be null
+     * @throws NullPointerException if ex is null
      */
     public static void throwUnchecked(final Throwable ex) {
         throwUnchecked(ex, null);
@@ -76,11 +73,31 @@ public final class Exceptions {
         throw (T) toThrow;
     }
 
-    static List<Throwable> buildUnmodifiableCauseList(Throwable cause, Throwable[] otherCauses) {
-        ArrayList<Throwable> causes = new ArrayList<Throwable>(otherCauses.length + 1);
-        causes.add(cause);
-        causes.addAll(Arrays.asList(otherCauses));
-        return Collections.unmodifiableList(causes);
+    private static final Splitter LINE_SPLITTER = Splitter.on(lineSeparator());
+    private static final Joiner LINE_JOINER = Joiner.on(lineSeparator());
+    private static final String CAUSED_BY = "caused by: ";
+    private static final String PADDING = " ";
+
+    static String throwableToString(String classAndMessage, ImmutableList<Throwable> causes) {
+        final String causeString = LINE_JOINER.join(FluentIterable.from(causes).transform(new Function<Throwable, String>() {
+            @Override
+            public String apply(Throwable cause) {
+                return CAUSED_BY + pad(cause.toString());
+            }
+        }));
+        return classAndMessage+(causeString.isEmpty() ? "" : lineSeparator()+causeString);
+    }
+
+    private static String pad(String throwableToString) {
+        final FluentIterable<String> lines = FluentIterable.from(LINE_SPLITTER.split(throwableToString));
+        final String classAndMessage = lines.first().get();
+        final String causeString = LINE_JOINER.join(lines.skip(1).transform(new Function<String, String>() {
+            @Override
+            public String apply(String line) {
+                return PADDING + line;
+            }
+        }));
+        return classAndMessage+(causeString.isEmpty() ? "" : lineSeparator()+causeString);
     }
 
     private Exceptions() {

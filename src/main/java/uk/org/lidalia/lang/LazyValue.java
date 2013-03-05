@@ -4,6 +4,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
+import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
+
 public class LazyValue<T> implements Callable<T> {
 
     private final FutureTask<T> supplier;
@@ -18,7 +20,7 @@ public class LazyValue<T> implements Callable<T> {
         try {
             return supplier.get();
         } catch (Exception e) {
-            return Exceptions.throwUnchecked(e.getCause(), null);
+            return throwUnchecked(e.getCause(), null);
         }
     }
 }
