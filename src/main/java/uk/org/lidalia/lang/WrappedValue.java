@@ -1,14 +1,13 @@
 package uk.org.lidalia.lang;
 
-import org.apache.commons.lang3.Validate;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class WrappedValue<E> extends RichObject {
 
     @Identity private final E wrappedValue;
 
     public WrappedValue(E wrappedValue) {
-        Validate.notNull(wrappedValue);
-        this.wrappedValue = wrappedValue;
+        this.wrappedValue = checkNotNull(wrappedValue);
     }
 
     @Override
