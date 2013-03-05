@@ -31,7 +31,8 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Strings.repeat;
+import static com.google.common.collect.FluentIterable.from;
+import static com.google.common.collect.ImmutableList.builder;
 import static java.lang.System.lineSeparator;
 
 public final class Exceptions {
@@ -79,25 +80,25 @@ public final class Exceptions {
     private static final String PADDING = " ";
 
     static String throwableToString(String classAndMessage, ImmutableList<Throwable> causes) {
-        final String causeString = LINE_JOINER.join(FluentIterable.from(causes).transform(new Function<Throwable, String>() {
+        FluentIterable<String> causeStrings = from(causes).transform(new Function<Throwable, String>() {
             @Override
             public String apply(Throwable cause) {
                 return CAUSED_BY + pad(cause.toString());
             }
-        }));
-        return classAndMessage+(causeString.isEmpty() ? "" : lineSeparator()+causeString);
+        });
+        return LINE_JOINER.join(builder().add(classAndMessage).addAll(causeStrings).build());
     }
 
     private static String pad(String throwableToString) {
-        final FluentIterable<String> lines = FluentIterable.from(LINE_SPLITTER.split(throwableToString));
+        final FluentIterable<String> lines = from(LINE_SPLITTER.split(throwableToString));
         final String classAndMessage = lines.first().get();
-        final String causeString = LINE_JOINER.join(lines.skip(1).transform(new Function<String, String>() {
+        FluentIterable<String> causeStrings = lines.skip(1).transform(new Function<String, String>() {
             @Override
             public String apply(String line) {
                 return PADDING + line;
             }
-        }));
-        return classAndMessage+(causeString.isEmpty() ? "" : lineSeparator()+causeString);
+        });
+        return LINE_JOINER.join(builder().add(classAndMessage).addAll(causeStrings).build());
     }
 
     private Exceptions() {

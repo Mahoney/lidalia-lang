@@ -1,6 +1,10 @@
 package uk.org.lidalia.lang;
 
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 import static com.google.common.collect.ImmutableList.of;
 import static java.lang.System.lineSeparator;
@@ -79,16 +83,31 @@ public class RichExceptionTests {
 
     @Test
     public void toStringMultipleNestedCauses() {
+        assertThat(exceptionWithNestedCauses().toString(), is(
+                "uk.org.lidalia.lang.RichException: some message"+ lineSeparator()+
+                "caused by: uk.org.lidalia.lang.RichException: cause1 message"+lineSeparator()+
+                " caused by: uk.org.lidalia.lang.RichException: cause1a message"+lineSeparator()+
+                "caused by: uk.org.lidalia.lang.RichException: cause2 message"+lineSeparator()+
+                " caused by: uk.org.lidalia.lang.RichException: cause2a message"));
+    }
+
+    @Test @Ignore
+    public void printStackTraceMultipleNestedCauses() {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        PrintStream stream = new PrintStream(bytes);
+
+        exceptionWithNestedCauses().printStackTrace(stream);
+
+        assertThat(bytes.toString(), is(
+                "uk.org.lidalia.lang.RichException: cause1a message"+lineSeparator()+
+                "\tat uk.org.lidalia.lang.RichExceptionTests.exceptionWithNestedCauses(RichExceptionTests.java:104)"));
+    }
+
+    private RichException exceptionWithNestedCauses() {
         final RichException cause1a = new RichException("cause1a message");
         final RichException cause1 = new RichException("cause1 message", cause1a);
         final RichException cause2a = new RichException("cause2a message");
         final RichException cause2 = new RichException("cause2 message", cause2a);
-        final RichException exception = new RichException("some message", cause1, cause2);
-        assertThat(exception.toString(), is(
-                "uk.org.lidalia.lang.RichException: some message"+ lineSeparator()+
-                "caused by: uk.org.lidalia.lang.RichException: cause1 message"+ lineSeparator()+
-                " caused by: uk.org.lidalia.lang.RichException: cause1a message"+ lineSeparator()+
-                "caused by: uk.org.lidalia.lang.RichException: cause2 message"+ lineSeparator()+
-                " caused by: uk.org.lidalia.lang.RichException: cause2a message"));
+        return new RichException("some message", cause1, cause2);
     }
 }
