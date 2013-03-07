@@ -36,23 +36,8 @@ public class RichExceptionTests {
     @Test
     public void oneCause() {
         final Throwable cause = new Exception();
-
         final RichException exception = new RichException(cause);
-
         assertThat(exception.getCause(), is(cause));
-        assertThat(exception.getCauses(), is(of(cause)));
-    }
-
-    @Test
-    public void multipleCauses() {
-        final Throwable cause1 = new Exception();
-        final Throwable cause2 = new Exception();
-        final Throwable cause3 = new Exception();
-
-        final RichException exception = new RichException(cause1, cause2, cause3);
-
-        assertThat(exception.getCause(), is(cause1));
-        assertThat(exception.getCauses(), is(of(cause1, cause2, cause3)));
     }
 
     @Test
@@ -61,16 +46,6 @@ public class RichExceptionTests {
             @Override
             public void run() {
                 new RichException("", null);
-            }
-        });
-    }
-
-    @Test
-    public void nullOtherCause() {
-        shouldThrow(NullPointerException.class, new Runnable() {
-            @Override
-            public void run() {
-                new RichException("", new Exception(), null);
             }
         });
     }
@@ -85,10 +60,8 @@ public class RichExceptionTests {
     public void toStringMultipleNestedCauses() {
         assertThat(exceptionWithNestedCauses().toString(), is(
                 "uk.org.lidalia.lang.RichException: some message"+ lineSeparator()+
-                "caused by: uk.org.lidalia.lang.RichException: cause1 message"+lineSeparator()+
-                " caused by: uk.org.lidalia.lang.RichException: cause1a message"+lineSeparator()+
-                "caused by: uk.org.lidalia.lang.RichException: cause2 message"+lineSeparator()+
-                " caused by: uk.org.lidalia.lang.RichException: cause2a message"));
+                "Caused by: uk.org.lidalia.lang.RichException: cause1 message"+lineSeparator()+
+                "Caused by: uk.org.lidalia.lang.RichException: cause1a message"));
     }
 
     @Test @Ignore
@@ -100,14 +73,12 @@ public class RichExceptionTests {
 
         assertThat(bytes.toString(), is(
                 "uk.org.lidalia.lang.RichException: cause1a message"+lineSeparator()+
-                "\tat uk.org.lidalia.lang.RichExceptionTests.exceptionWithNestedCauses(RichExceptionTests.java:104)"));
+                "\tat "+getClass().getName()+".exceptionWithNestedCauses("+getClass().getSimpleName()+".java:104)"));
     }
 
     private RichException exceptionWithNestedCauses() {
         final RichException cause1a = new RichException("cause1a message");
         final RichException cause1 = new RichException("cause1 message", cause1a);
-        final RichException cause2a = new RichException("cause2a message");
-        final RichException cause2 = new RichException("cause2 message", cause2a);
-        return new RichException("some message", cause1, cause2);
+        return new RichException("some message", cause1);
     }
 }

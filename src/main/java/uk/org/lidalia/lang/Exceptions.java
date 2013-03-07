@@ -26,6 +26,7 @@ package uk.org.lidalia.lang;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -76,29 +77,16 @@ public final class Exceptions {
 
     private static final Splitter LINE_SPLITTER = Splitter.on(lineSeparator());
     private static final Joiner LINE_JOINER = Joiner.on(lineSeparator());
-    private static final String CAUSED_BY = "caused by: ";
+    private static final String CAUSED_BY = "Caused by: ";
     private static final String PADDING = " ";
 
-    static String throwableToString(String classAndMessage, ImmutableList<Throwable> causes) {
-        FluentIterable<String> causeStrings = from(causes).transform(new Function<Throwable, String>() {
+    static String throwableToString(String classAndMessage, Optional<Throwable> cause) {
+        return classAndMessage+cause.transform(new Function<Throwable, String>() {
             @Override
-            public String apply(Throwable cause) {
-                return CAUSED_BY + pad(cause.toString());
+            public String apply(Throwable input) {
+                return lineSeparator()+CAUSED_BY+input;
             }
-        });
-        return LINE_JOINER.join(builder().add(classAndMessage).addAll(causeStrings).build());
-    }
-
-    private static String pad(String throwableToString) {
-        final FluentIterable<String> lines = from(LINE_SPLITTER.split(throwableToString));
-        final String classAndMessage = lines.first().get();
-        FluentIterable<String> causeStrings = lines.skip(1).transform(new Function<String, String>() {
-            @Override
-            public String apply(String line) {
-                return PADDING + line;
-            }
-        });
-        return LINE_JOINER.join(builder().add(classAndMessage).addAll(causeStrings).build());
+        }).or("");
     }
 
     private Exceptions() {
