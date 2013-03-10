@@ -16,12 +16,17 @@ public final class Classes {
     }
 
     /**
-     * @return true if and and be are the same type, or a is a subtype of b or vice versa
+     * @return true if a and b are the same type, or a is a subtype of b, or b is a subtype of a
      */
     public static boolean inSameClassHierarchy(Class<?> a, Class<?> b) {
-            return a.isAssignableFrom(b) || b.isAssignableFrom(a);
+        return a.isAssignableFrom(b) || b.isAssignableFrom(a);
     }
 
+    /**
+     * @param type the class to check for the existence of the constructor
+     * @param parameterTypes the types of the parameters of the constructor
+     * @return true if a constructor with those types exists on the class, false otherwise
+     */
     public static boolean hasConstructor(Class<?> type, Class<?>... parameterTypes) {
         try {
             final Constructor<?> constructor = type.getConstructor(parameterTypes);

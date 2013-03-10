@@ -33,7 +33,7 @@ import org.junit.Test;
 
 import java.util.concurrent.Callable;
 
-public class TestExceptions {
+public class ExceptionsTests {
 
     @Test
     public void throwUncheckedWithCheckedException() {
@@ -57,6 +57,30 @@ public class TestExceptions {
 
             private String compilerThinksReturnsString() {
                 return throwUnchecked(checkedException, null);
+            }
+        });
+    }
+
+    @Test
+    public void throwUncheckedWithNull() {
+        shouldThrow(NullPointerException.class, new Runnable() {
+            @Override
+            public void run() {
+                throwUnchecked(null);
+            }
+        });
+    }
+
+    @Test
+    public void throwUncheckedWithNullAndReturnStatementToTrickCompiler() {
+        shouldThrow(NullPointerException.class, new Runnable() {
+            @Override
+            public void run() {
+                compilerThinksReturnsString();
+            }
+
+            private String compilerThinksReturnsString() {
+                return throwUnchecked(null, null);
             }
         });
     }

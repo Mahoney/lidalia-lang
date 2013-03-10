@@ -23,7 +23,11 @@ import static java.util.Arrays.asList;
 import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
 import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 
-public class RichObject {
+/**
+ * A class that provides implementations of {@link #equals(Object)}, {@link #hashCode()} and {@link #toString()} for its subtypes
+ * based on annotating the fields of the subtypes with the {@link Identity} annotation.
+ */
+public abstract class RichObject {
 
     private static final int PRIME = 37;
     private static final int INITIAL_HASHCODE_VALUE = 17;
@@ -38,6 +42,20 @@ public class RichObject {
         }
     };
 
+    /**
+     * Applies equality rules on the following basis (in addition to the rules in {@link Object#equals(Object)}:
+     * <ul>
+     * <li> other's runtime class must be the same, a super or a sub type of the runtime class of this instance
+     * <li> other's runtime class must have exactly the same set of fields annotated with {@link Identity} as those on the runtime
+     *      class of this instance, where the set of fields in each case comprises those on the class and all of its superclasses
+     * <li> the value of any field annotated with {@link Identity} on this must be equal to the value of the same field on other
+     * <p>
+     * The practical result of this is that an instance of subtype B of subtype A of RichObject can only be equal to an instance
+     * of subtype A if B does not annotate any of its fields with {@link Identity}.
+     *
+     * @param other the object to compare against
+     * @return true if the other type is logically equal to this
+     */
     @Override public final boolean equals(final Object other) {
         // Usual equals checks
         if (other == this) {
@@ -73,20 +91,32 @@ public class RichObject {
         return new Predicate<FieldFacade>() {
             @Override
             public boolean apply(FieldFacade field) {
-                return RichObject.this.valueOf(field).equals(other.valueOf(field));
+                return valueOf(field).equals(other.valueOf(field));
             }
         };
     }
 
+    /**
+     * Default implementation of hashCode - can be overridden to provide more efficient ones provided the contract specified
+     * in {@link Object#hashCode()} is maintained with respect to {@link #equals(Object)}
+     *
+     * @return hash code computed from the hashes of all the fields annotated with {@link Identity}
+     */
     @Override public int hashCode() {
         int result = INITIAL_HASHCODE_VALUE;
         for (final FieldFacade field : fields()) {
-            final int toAdd = this.valueOf(field).transform(toHashCode).or(0);
+            final int toAdd = valueOf(field).transform(toHashCode).or(0);
             result = PRIME * result + toAdd;
         }
         return result;
     }
 
+    /**
+     * Default implementation of toString
+     *
+     * @return a string in the form ClassName[field1=value1,field2=value2] where the fields are those annotated with
+     * {@link Identity}
+     */
     @Override public String toString() {
         final Iterable<String> fieldsAsStrings = fields().transform(toStringValueOfField());
         return ""+getClass().getSimpleName()+"["+FIELD_JOINER.join(fieldsAsStrings)+"]";
@@ -144,7 +174,7 @@ public class RichObject {
         }
     }
 
-    private static class FieldFacade extends WrappedValue<Field> {
+    private static class FieldFacade extends WrappedValue {
         private final Field field;
 
         private FieldFacade(Field field) {
@@ -154,6 +184,9 @@ public class RichObject {
 
         public Optional<Object> valueOn(Object target) {
             try {
+                if (!field.isAccessible()) {
+                    makeAccessible();
+                }
                 return fromNullable(field.get(target));
             } catch (IllegalAccessException e) {
                 throw new IllegalStateException(field+" was not accessible; all fields should be accessible", e);
@@ -165,11 +198,7 @@ public class RichObject {
         }
 
         public boolean isIdentityField() {
-            final boolean isIdentityField = field.isAnnotationPresent(Identity.class);
-            if (isIdentityField && !isPublic()) {
-                makeAccessible();
-            }
-            return isIdentityField;
+            return field.isAnnotationPresent(Identity.class);
         }
 
         private void makeAccessible() {
@@ -180,10 +209,6 @@ public class RichObject {
                     return null;
                 }
             });
-        }
-
-        public boolean isPublic() {
-            return Modifier.isPublic(field.getModifiers());
         }
     }
 }

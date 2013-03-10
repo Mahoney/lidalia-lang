@@ -22,7 +22,7 @@ import uk.org.lidalia.lang.testclasses.NoFields;
 public class RichObjectTests {
 
     @Test public void equalsObject() {
-        RichObject richObject = new RichObject();
+        RichObject richObject = new RichObject(){};
         Object object = new Object();
         assertThat(richObject, isNotEqualTo(object));
     }

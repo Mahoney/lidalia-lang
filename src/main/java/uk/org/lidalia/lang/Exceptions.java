@@ -24,17 +24,7 @@
 
 package uk.org.lidalia.lang;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
-
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.FluentIterable.from;
-import static com.google.common.collect.ImmutableList.builder;
-import static java.lang.System.lineSeparator;
 
 public final class Exceptions {
 
@@ -73,20 +63,6 @@ public final class Exceptions {
     @SuppressWarnings("unchecked")
     private static <T extends Throwable> void doThrowUnchecked(Throwable toThrow) throws T {
         throw (T) toThrow;
-    }
-
-    private static final Splitter LINE_SPLITTER = Splitter.on(lineSeparator());
-    private static final Joiner LINE_JOINER = Joiner.on(lineSeparator());
-    private static final String CAUSED_BY = "Caused by: ";
-    private static final String PADDING = " ";
-
-    static String throwableToString(String classAndMessage, Optional<Throwable> cause) {
-        return classAndMessage+cause.transform(new Function<Throwable, String>() {
-            @Override
-            public String apply(Throwable input) {
-                return lineSeparator()+CAUSED_BY+input;
-            }
-        }).or("");
     }
 
     private Exceptions() {

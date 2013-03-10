@@ -1,12 +1,13 @@
 package uk.org.lidalia.lang;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.base.Supplier;
 
+import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.Thread.currentThread;
 
 /**
  * A ThreadLocal that has no {@link ClassLoader} leaks associated with it & does not permit null.
@@ -19,6 +20,14 @@ public class ThreadLocal<T> {
 
     private final Map<Thread, T> contents = new ConcurrentHashMap<>();
     private final Supplier<T> initialValueCreator;
+    private final Supplier<T> threadValueInitialiser = new Supplier<T>() {
+        @Override
+        public T get() {
+            T initialValue = initialValueCreator.get();
+            set(initialValue);
+            return initialValue;
+        }
+    };
 
     /**
      * @param initialValue the value this thread local will initially have for all {@link Thread}s.
@@ -28,7 +37,7 @@ public class ThreadLocal<T> {
         this(new Supplier<T>() {
             @Override
             public T get() {
-                return checkNotNull(initialValue);
+                return initialValue;
             }
         });
     }
@@ -39,8 +48,7 @@ public class ThreadLocal<T> {
      *                            allowing a different initial instance per {@link Thread}.
      */
     public ThreadLocal(final Supplier<T> initialValueCreator) {
-        checkNotNull(initialValueCreator);
-        this.initialValueCreator = initialValueCreator;
+        this.initialValueCreator = checkNotNull(initialValueCreator);
         set(initialValueCreator.get());
     }
 
@@ -48,20 +56,14 @@ public class ThreadLocal<T> {
      * @param value the new value for the calling {@link Thread} - does not affect the value for any other {@link Thread}.
      */
     public void set(T value) {
-        contents.put(Thread.currentThread(), checkNotNull(value));
+        contents.put(currentThread(), checkNotNull(value));
     }
 
     /**
      * @return the value for the calling {@link Thread}, or the initial value if this has not been set or has been removed.
      */
     public T get() {
-        T value = contents.get(Thread.currentThread());
-        if (value == null) {
-            T initialValue = initialValueCreator.get();
-            set(initialValue);
-            return initialValue;
-        }
-        return value;
+        return fromNullable(contents.get(currentThread())).or(threadValueInitialiser);
     }
 
     /**
@@ -69,7 +71,7 @@ public class ThreadLocal<T> {
      * A subsequent call to {@link #get()} will return the initial value.
      */
     public void remove() {
-        contents.remove(Thread.currentThread());
+        contents.remove(currentThread());
     }
 
     /**
@@ -78,9 +80,5 @@ public class ThreadLocal<T> {
      */
     public void reset() {
         contents.clear();
-    }
-
-    public Collection<T> allValues() {
-        return contents.values();
     }
 }
