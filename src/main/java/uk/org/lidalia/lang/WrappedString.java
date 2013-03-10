@@ -7,13 +7,7 @@ public abstract class WrappedString<T extends WrappedString<T>> extends WrappedV
     }
 
     @Override
-    public final String toString() {
-        return getWrappedValue();
-    }
-
-    @Override
     public T toImmutable() {
         return (T) this;
     }
-
 }

@@ -37,7 +37,7 @@ public class TestExceptions {
 
     @Test
     public void throwUncheckedWithCheckedException() {
-        final RichException checkedException = new RichException();
+        final Exception checkedException = new Exception();
         shouldThrow(checkedException, new Runnable() {
             @Override
             public void run() {
@@ -48,10 +48,14 @@ public class TestExceptions {
 
     @Test
      public void throwUncheckedWithCheckedExceptionAndReturnStatementToTrickCompiler() {
-        final RichException checkedException = new RichException();
-        shouldThrow(checkedException, new Callable<Void>() {
+        final Exception checkedException = new Exception();
+        shouldThrow(checkedException, new Runnable() {
             @Override
-            public Void call() {
+            public void run() {
+                compilerThinksReturnsString();
+            }
+
+            private String compilerThinksReturnsString() {
                 return throwUnchecked(checkedException, null);
             }
         });

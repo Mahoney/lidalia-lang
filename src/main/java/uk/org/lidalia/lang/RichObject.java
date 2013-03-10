@@ -1,14 +1,5 @@
 package uk.org.lidalia.lang;
 
-import static com.google.common.base.Objects.equal;
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.collect.Iterables.transform;
-import static java.security.AccessController.doPrivileged;
-import static java.util.Arrays.asList;
-import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
-import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
-
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.PrivilegedAction;
@@ -26,22 +17,26 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
+import static com.google.common.base.Optional.fromNullable;
+import static java.security.AccessController.doPrivileged;
+import static java.util.Arrays.asList;
+import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
+import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
+
 public class RichObject {
 
     private static final int PRIME = 37;
     private static final int INITIAL_HASHCODE_VALUE = 17;
 
-    private static final LoadingCache<Class<? extends RichObject>, ImmutableSet<Field>> IDENTITY_FIELDS =
+    private static final LoadingCache<Class<?>, FluentIterable<FieldFacade>> IDENTITY_FIELDS =
             CacheBuilder.newBuilder().weakKeys().softValues().build(new IdentityFieldLoader());
     private static final Joiner FIELD_JOINER = Joiner.on(",");
-
-    private static Set<Field> getIdentityFields(Class<? extends RichObject> aClass) {
-        try {
-            return IDENTITY_FIELDS.get(aClass);
-        } catch (ExecutionException e) {
-            return throwUnchecked(e.getCause(), null);
+    private static final Function<Object,Integer> toHashCode = new Function<Object, Integer>() {
+        @Override
+        public Integer apply(Object fieldValue) {
+            return fieldValue.hashCode();
         }
-    }
+    };
 
     @Override public final boolean equals(final Object other) {
         // Usual equals checks
@@ -53,148 +48,142 @@ public class RichObject {
         }
 
         // One of the two must be a subtype of the other
-        if (!inSameClassHierarchy(this.getClass(), other.getClass())) {
+        if (!(other instanceof RichObject) || !inSameClassHierarchy(getClass(), other.getClass())) {
             return false;
         }
+
+        RichObject that = (RichObject) other;
 
         // They must have precisely the same set of identity members to meet the
         // symmetric & transitive requirement of equals
-        final Set<Field> thisFields = getIdentityFields(this.getClass());
-        if (thisFields.size() == 0) {
-            return false;
-        }
-        final Set<Field> otherFields = getIdentityFields((Class<? extends RichObject>) other.getClass());
-        if (!thisFields.equals(otherFields)) {
-            return false;
-        }
-
-        try {
-            for (final Field field : thisFields) {
-                if (!equal(field.get(other), field.get(this))) {
-                    return false;
-                }
-            }
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException("All fields should be accessible", e);
-        }
-        return true;
+        final FluentIterable<FieldFacade> fieldsOfThis = fields();
+        return fieldsOfThis.toImmutableSet().equals(that.fields().toImmutableSet())
+                && fieldsOfThis.allMatch(hasEqualValueIn(that));
     }
 
-    private volatile int hashCode = -1;
+    private FluentIterable<FieldFacade> fields() {
+        try {
+            return IDENTITY_FIELDS.get(getClass());
+        } catch (ExecutionException e) {
+            return throwUnchecked(e.getCause(), null);
+        }
+    }
+
+    private Predicate<FieldFacade> hasEqualValueIn(final RichObject other) {
+        return new Predicate<FieldFacade>() {
+            @Override
+            public boolean apply(FieldFacade field) {
+                return RichObject.this.valueOf(field).equals(other.valueOf(field));
+            }
+        };
+    }
 
     @Override public int hashCode() {
-
-        if (hashCode != -1) {
-            return hashCode;
-        }
-
         int result = INITIAL_HASHCODE_VALUE;
-        try {
-            final Class<? extends RichObject> aClass = this.getClass();
-            final Set<Field> thisFields = getIdentityFields(aClass);
-            for (final Field field : thisFields) {
-                final Object value = field.get(this);
-                final int toAdd;
-                if (value == null) {
-                    toAdd = 0;
-                } else {
-                    toAdd = value.hashCode();
-                }
-                result = PRIME * result + toAdd;
-            }
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException("All fields should be accessible", e);
-        }
-        if (this instanceof Immutable) {
-            hashCode = result;
+        for (final FieldFacade field : fields()) {
+            final int toAdd = this.valueOf(field).transform(toHashCode).or(0);
+            result = PRIME * result + toAdd;
         }
         return result;
     }
-
-    private volatile String toString = null;
 
     @Override public String toString() {
+        final Iterable<String> fieldsAsStrings = fields().transform(toStringValueOfField());
+        return ""+getClass().getSimpleName()+"["+FIELD_JOINER.join(fieldsAsStrings)+"]";
+    }
 
-        if (toString != null) {
-            return toString;
-        }
-
-        final Set<Field> thisFields = getIdentityFields(this.getClass());
-        if (thisFields.isEmpty()) {
-            return super.toString();
-        }
-
-        final StringBuilder builder = new StringBuilder(this.getClass().getSimpleName());
-        final Iterable<String> fieldsAsStrings = transform(thisFields, new Function<Field, String>() {
+    private Function<FieldFacade, String> toStringValueOfField() {
+        return new Function<FieldFacade, String>() {
             @Override
-            public String apply(Field field) {
-                try {
-                    return field.getName() + "=" + field.get(RichObject.this);
-                } catch (IllegalAccessException e) {
-                    throw new IllegalStateException("All fields should be accessible", e);
-                }
+            public String apply(FieldFacade field) {
+                return field.getName() + "=" + valueOf(field).or("absent");
             }
-        });
-        builder.append("[");
-        FIELD_JOINER.appendTo(builder, fieldsAsStrings).append("]");
-
-        final String result = builder.toString();
-        if (this instanceof Immutable) {
-            toString = result;
-        }
-        return result;
+        };
     }
 
-    public boolean instanceOf(Class<?> possibleSuperType) {
-        return possibleSuperType.isInstance(this);
+    private Optional<Object> valueOf(FieldFacade field) {
+        return field.valueOn(this);
     }
 
-    private static class IdentityFieldLoader extends CacheLoader<Class<?>, ImmutableSet<Field>> {
-
-        private static final IsIdentityField IS_IDENTITY_FIELD = new IsIdentityField();
+    private static class IdentityFieldLoader extends CacheLoader<Class<?>, FluentIterable<FieldFacade>> {
 
         @Override
-        public ImmutableSet<Field> load(Class<?> key) {
-            final ImmutableSet<Field> localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))
-                    .filter(IS_IDENTITY_FIELD)
-                    .toImmutableSet();
-            final Optional<? extends Class<?>> superClass = fromNullable(key.getSuperclass());
-            final ImmutableSet<Field> superIdentityFieldSet = superClass.transform(new Function<Class<?>, ImmutableSet<Field>>() {
-                @Override
-                public ImmutableSet<Field> apply(Class<?> input) {
-                    try {
-                        return load(input);
-                    } catch (Exception e) {
-                        return throwUnchecked(e, null);
-                    }
-                }
-            }).or(ImmutableSet.<Field>of());
-            return ImmutableSet.copyOf(Sets.union(localIdentityFieldSet, superIdentityFieldSet));
+        public FluentIterable<FieldFacade> load(Class<?> key) {
+            return FluentIterable.from(doLoad(key));
         }
 
-        private static class IsIdentityField implements Predicate<Field> {
+        private static final Predicate<FieldFacade> onlyIdentityFields = new Predicate<FieldFacade>() {
             @Override
-            public boolean apply(final Field field) {
-                final boolean isIdentityField = field.isAnnotationPresent(Identity.class);
-                if (isIdentityField && !Modifier.isPublic(field.getModifiers())) {
-                    doPrivileged(new SetAccessibleAction(field));
-                }
-                return isIdentityField;
+            public boolean apply(final FieldFacade field) {
+                return field.isIdentityField();
             }
+        };
 
-            private static class SetAccessibleAction implements PrivilegedAction<Void> {
-                private final AccessibleObject member;
+        private static final Function<Field, FieldFacade> toFieldFacade = new Function<Field, FieldFacade>() {
+            @Override
+            public FieldFacade apply(Field field) {
+                return new FieldFacade(field);
+            }
+        };
 
-                public SetAccessibleAction(AccessibleObject member) {
-                    this.member = member;
-                }
+        private static final Function<Class<?>,Set<FieldFacade>> toFieldSet = new Function<Class<?>, Set<FieldFacade>>() {
+            @Override
+            public Set<FieldFacade> apply(Class<?> input) {
+                return doLoad(input);
+            }
+        };
 
+        private static Set<FieldFacade> doLoad(Class<?> key) {
+            final ImmutableSet<FieldFacade> localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))
+                    .transform(toFieldFacade)
+                    .filter(onlyIdentityFields)
+                    .toImmutableSet();
+            final Optional<? extends Class<?>> superClass = fromNullable(key.getSuperclass());
+            final Set<FieldFacade> superIdentityFieldSet = superClass.transform(toFieldSet).or(ImmutableSet.<FieldFacade>of());
+            return Sets.union(localIdentityFieldSet, superIdentityFieldSet);
+        }
+    }
+
+    private static class FieldFacade extends WrappedValue<Field> {
+        private final Field field;
+
+        private FieldFacade(Field field) {
+            super(field);
+            this.field = field;
+        }
+
+        public Optional<Object> valueOn(Object target) {
+            try {
+                return fromNullable(field.get(target));
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException(field+" was not accessible; all fields should be accessible", e);
+            }
+        }
+
+        public String getName() {
+            return field.getName();
+        }
+
+        public boolean isIdentityField() {
+            final boolean isIdentityField = field.isAnnotationPresent(Identity.class);
+            if (isIdentityField && !isPublic()) {
+                makeAccessible();
+            }
+            return isIdentityField;
+        }
+
+        private void makeAccessible() {
+            doPrivileged(new PrivilegedAction<Void>() {
                 @Override
                 public Void run() {
-                    member.setAccessible(true);
+                    field.setAccessible(true);
                     return null;
                 }
-            }
+            });
+        }
+
+        public boolean isPublic() {
+            return Modifier.isPublic(field.getModifiers());
         }
     }
 }
