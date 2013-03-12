@@ -23,7 +23,7 @@ public class ThreadLocal<T> {
     private final Supplier<T> threadValueInitialiser = new Supplier<T>() {
         @Override
         public T get() {
-            T initialValue = initialValueCreator.get();
+            final T initialValue = initialValueCreator.get();
             set(initialValue);
             return initialValue;
         }
@@ -49,13 +49,17 @@ public class ThreadLocal<T> {
      */
     public ThreadLocal(final Supplier<T> initialValueCreator) {
         this.initialValueCreator = checkNotNull(initialValueCreator);
-        set(initialValueCreator.get());
+        doSet(initialValueCreator.get());
     }
 
     /**
      * @param value the new value for the calling {@link Thread} - does not affect the value for any other {@link Thread}.
      */
-    public void set(T value) {
+    public void set(final T value) {
+        doSet(value);
+    }
+
+    private void doSet(final T value) {
         contents.put(currentThread(), checkNotNull(value));
     }
 

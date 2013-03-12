@@ -1,7 +1,6 @@
 package uk.org.lidalia.lang;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.security.PrivilegedAction;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -24,8 +23,9 @@ import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
 import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 
 /**
- * A class that provides implementations of {@link #equals(Object)}, {@link #hashCode()} and {@link #toString()} for its subtypes
- * based on annotating the fields of the subtypes with the {@link Identity} annotation.
+ * A class that provides implementations of {@link #equals(Object)}, {@link #hashCode()} and {@link #toString()} for its subtypes.
+ * <p>
+ * These implementations are based on annotating the fields of the subtypes with the {@link Identity} annotation.
  */
 public abstract class RichObject {
 
@@ -35,9 +35,9 @@ public abstract class RichObject {
     private static final LoadingCache<Class<?>, FluentIterable<FieldFacade>> IDENTITY_FIELDS =
             CacheBuilder.newBuilder().weakKeys().softValues().build(new IdentityFieldLoader());
     private static final Joiner FIELD_JOINER = Joiner.on(",");
-    private static final Function<Object,Integer> toHashCode = new Function<Object, Integer>() {
+    private static final Function<Object, Integer> toHashCode = new Function<Object, Integer>() {
         @Override
-        public Integer apply(Object fieldValue) {
+        public Integer apply(final Object fieldValue) {
             return fieldValue.hashCode();
         }
     };
@@ -49,6 +49,7 @@ public abstract class RichObject {
      * <li> other's runtime class must have exactly the same set of fields annotated with {@link Identity} as those on the runtime
      *      class of this instance, where the set of fields in each case comprises those on the class and all of its superclasses
      * <li> the value of any field annotated with {@link Identity} on this must be equal to the value of the same field on other
+     * </ul>
      * <p>
      * The practical result of this is that an instance of subtype B of subtype A of RichObject can only be equal to an instance
      * of subtype A if B does not annotate any of its fields with {@link Identity}.
@@ -70,7 +71,7 @@ public abstract class RichObject {
             return false;
         }
 
-        RichObject that = (RichObject) other;
+        final RichObject that = (RichObject) other;
 
         // They must have precisely the same set of identity members to meet the
         // symmetric & transitive requirement of equals
@@ -90,7 +91,7 @@ public abstract class RichObject {
     private Predicate<FieldFacade> hasEqualValueIn(final RichObject other) {
         return new Predicate<FieldFacade>() {
             @Override
-            public boolean apply(FieldFacade field) {
+            public boolean apply(final FieldFacade field) {
                 return valueOf(field).equals(other.valueOf(field));
             }
         };
@@ -98,7 +99,7 @@ public abstract class RichObject {
 
     /**
      * Default implementation of hashCode - can be overridden to provide more efficient ones provided the contract specified
-     * in {@link Object#hashCode()} is maintained with respect to {@link #equals(Object)}
+     * in {@link Object#hashCode()} is maintained with respect to {@link #equals(Object)}.
      *
      * @return hash code computed from the hashes of all the fields annotated with {@link Identity}
      */
@@ -112,33 +113,33 @@ public abstract class RichObject {
     }
 
     /**
-     * Default implementation of toString
+     * Default implementation of toString.
      *
      * @return a string in the form ClassName[field1=value1,field2=value2] where the fields are those annotated with
      * {@link Identity}
      */
     @Override public String toString() {
         final Iterable<String> fieldsAsStrings = fields().transform(toStringValueOfField());
-        return ""+getClass().getSimpleName()+"["+FIELD_JOINER.join(fieldsAsStrings)+"]";
+        return getClass().getSimpleName()+"["+FIELD_JOINER.join(fieldsAsStrings)+"]";
     }
 
     private Function<FieldFacade, String> toStringValueOfField() {
         return new Function<FieldFacade, String>() {
             @Override
-            public String apply(FieldFacade field) {
+            public String apply(final FieldFacade field) {
                 return field.getName() + "=" + valueOf(field).or("absent");
             }
         };
     }
 
-    private Optional<Object> valueOf(FieldFacade field) {
+    private Optional<Object> valueOf(final FieldFacade field) {
         return field.valueOn(this);
     }
 
     private static class IdentityFieldLoader extends CacheLoader<Class<?>, FluentIterable<FieldFacade>> {
 
         @Override
-        public FluentIterable<FieldFacade> load(Class<?> key) {
+        public FluentIterable<FieldFacade> load(final Class<?> key) {
             return FluentIterable.from(doLoad(key));
         }
 
@@ -151,19 +152,19 @@ public abstract class RichObject {
 
         private static final Function<Field, FieldFacade> toFieldFacade = new Function<Field, FieldFacade>() {
             @Override
-            public FieldFacade apply(Field field) {
+            public FieldFacade apply(final Field field) {
                 return new FieldFacade(field);
             }
         };
 
-        private static final Function<Class<?>,Set<FieldFacade>> toFieldSet = new Function<Class<?>, Set<FieldFacade>>() {
+        private static final Function<Class<?>, Set<FieldFacade>> toFieldSet = new Function<Class<?>, Set<FieldFacade>>() {
             @Override
-            public Set<FieldFacade> apply(Class<?> input) {
+            public Set<FieldFacade> apply(final Class<?> input) {
                 return doLoad(input);
             }
         };
 
-        private static Set<FieldFacade> doLoad(Class<?> key) {
+        private static Set<FieldFacade> doLoad(final Class<?> key) {
             final ImmutableSet<FieldFacade> localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))
                     .transform(toFieldFacade)
                     .filter(onlyIdentityFields)
@@ -177,12 +178,12 @@ public abstract class RichObject {
     private static class FieldFacade extends WrappedValue {
         private final Field field;
 
-        private FieldFacade(Field field) {
+        FieldFacade(final Field field) {
             super(field);
             this.field = field;
         }
 
-        public Optional<Object> valueOn(Object target) {
+        public Optional<Object> valueOn(final Object target) {
             try {
                 if (!field.isAccessible()) {
                     makeAccessible();

@@ -12,10 +12,10 @@ import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
  */
 public abstract class WrappedValue {
 
-    private final Object wrappedValue;
+    private final Object wrapped;
 
-    public WrappedValue(Object wrappedValue) {
-        this.wrappedValue = checkNotNull(wrappedValue);
+    public WrappedValue(final Object wrapped) {
+        this.wrapped = checkNotNull(wrapped);
     }
 
     /**
@@ -23,26 +23,28 @@ public abstract class WrappedValue {
      */
     @Override
     public String toString() {
-        return wrappedValue.toString();
+        return wrapped.toString();
     }
 
     /**
-     * Applies equality rules on the following basis (in addition to the rules in {@link Object#equals(Object)}:
+     * Applies equality rules based on the value of the wrapped object.
      * <ul>
+     * <li> normal rules in {@link Object#equals(Object)} - not equal to null, equal to same instance
      * <li> other's runtime class must be the same, a super or a sub type of the runtime class of this instance
      * <li> the value of the wrapped instance is the same as the value of the other's wrapped instance
+     * </ul>
      * @param other the object to compare against
      * @return true if the other type is logically equal to this
      */
     @Override
-    public final boolean equals(Object other) {
+    public final boolean equals(final Object other) {
         if (this == other) return true;
         if (other == null) return false;
         if (!(other instanceof WrappedValue) || !inSameClassHierarchy(getClass(), other.getClass())) return false;
 
-        WrappedValue that = (WrappedValue) other;
+        final WrappedValue that = (WrappedValue) other;
 
-        return wrappedValue.equals(that.wrappedValue);
+        return wrapped.equals(that.wrapped);
     }
 
     /**
@@ -50,6 +52,6 @@ public abstract class WrappedValue {
      */
     @Override
     public final int hashCode() {
-        return wrappedValue.hashCode();
+        return wrapped.hashCode();
     }
 }

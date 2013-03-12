@@ -15,7 +15,7 @@ public abstract class Task implements Runnable, Callable<Void> {
      * @throws Exception thrown by {@link #doRun()}
      */
     @Override
-    public final Void call() throws Exception {
+    public final Void call() throws Exception { //NOPMD no way of knowing what Exception implementer will throw
         doRun();
         return null;
     }
@@ -33,8 +33,8 @@ public abstract class Task implements Runnable, Callable<Void> {
     }
 
     /**
-     * Work of this task
+     * Work of this task.
      * @throws Exception
      */
-    public abstract void doRun() throws Exception;
+    public abstract void doRun() throws Exception; //NOPMD no way of knowing what Exception implementer will throw
 }

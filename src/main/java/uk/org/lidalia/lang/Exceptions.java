@@ -42,26 +42,26 @@ public final class Exceptions {
      *         }
      *     }
      * </pre>
-     * @param ex The exception that will be thrown, unwrapped and unchecked; must not be null
+     * @param toThrow The throwable that will be thrown, unwrapped and unchecked; must not be null
      * @param returnType trick to persuade the compiler that a method returns appropriately - always pass null here
      * @return Never returns, always throws the passed in exception
-     * @throws NullPointerException if ex is null
+     * @throws NullPointerException if toThrow is null
      */
-    public static <T> T throwUnchecked(final Throwable ex, final T returnType) {
-        Exceptions.<RuntimeException>doThrowUnchecked(checkNotNull(ex));
+    public static <T> T throwUnchecked(final Throwable toThrow, final T returnType) {
+        Exceptions.<RuntimeException>doThrowUnchecked(checkNotNull(toThrow));
         throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
     }
 
     /**
-     * @param ex The exception that will be thrown, unwrapped and unchecked; must not be null
-     * @throws NullPointerException if ex is null
+     * @param toThrow The throwable that will be thrown, unwrapped and unchecked; must not be null
+     * @throws NullPointerException if toThrow is null
      */
-    public static void throwUnchecked(final Throwable ex) {
-        throwUnchecked(ex, null);
+    public static void throwUnchecked(final Throwable toThrow) {
+        throwUnchecked(toThrow, null);
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Throwable> void doThrowUnchecked(Throwable toThrow) throws T {
+    private static <T extends Throwable> void doThrowUnchecked(final Throwable toThrow) throws T {
         throw (T) toThrow;
     }
 
