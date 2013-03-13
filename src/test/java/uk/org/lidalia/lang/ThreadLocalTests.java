@@ -6,8 +6,8 @@ import org.junit.Test;
 
 import com.google.common.base.Supplier;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 public class ThreadLocalTests {
 
@@ -26,13 +26,13 @@ public class ThreadLocalTests {
         thread.start();
         thread.join();
 
-        assertEquals("Thread1", threadLocal.get());
-        assertEquals("Thread2", fromThread.get());
+        assertThat(threadLocal.get(), is("Thread1"));
+        assertThat(fromThread.get(), is("Thread2"));
     }
 
     @Test public void resetWorksForAllThreads() throws InterruptedException {
-        final ThreadLocal<String> threadLocal = new ThreadLocal<String>("Initial");
-        final AtomicReference<String> fromThread = new AtomicReference<String>();
+        final ThreadLocal<String> threadLocal = new ThreadLocal<>("Initial");
+        final AtomicReference<String> fromThread = new AtomicReference<>();
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -45,8 +45,8 @@ public class ThreadLocalTests {
         thread.start();
         thread.join();
 
-        assertEquals("Initial", threadLocal.get());
-        assertEquals("Initial", threadLocal.get());
+        assertThat(threadLocal.get(), is("Initial"));
+        assertThat(fromThread.get(), is("Initial"));
     }
 
     @Test public void initialValueWorksForAllThreads() throws InterruptedException {
@@ -62,18 +62,18 @@ public class ThreadLocalTests {
         thread.start();
         thread.join();
 
-        assertEquals("Initial Value", threadLocal.get());
-        assertEquals("Initial Value", fromThread.get());
+        assertThat(threadLocal.get(), is("Initial Value"));
+        assertThat(fromThread.get(), is("Initial Value"));
     }
 
     @Test public void initialValueSourceIsCalledSeparatelyPerThread() throws InterruptedException {
-        final ThreadLocal<Object> threadLocal = new ThreadLocal<Object>(new Supplier<Object>() {
+        final ThreadLocal<String> threadLocal = new ThreadLocal<>(new Supplier<String>() {
             @Override
-            public Object get() {
-                return new Object();
+            public String get() {
+                return Thread.currentThread().getName();
             }
         });
-        final AtomicReference<Object> fromThread = new AtomicReference<Object>();
+        final AtomicReference<String> fromThread = new AtomicReference<>();
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -84,6 +84,76 @@ public class ThreadLocalTests {
         thread.start();
         thread.join();
 
-        assertNotSame(threadLocal.get(), fromThread.get());
+        assertThat(threadLocal.get(), is(Thread.currentThread().getName()));
+        assertThat(fromThread.get(), is(thread.getName()));
+    }
+
+    @Test public void initialValueSourceIsStateful() throws InterruptedException {
+        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<>(new Supplier<AtomicReference<String>>() {
+            @Override
+            public AtomicReference<String> get() {
+                return new AtomicReference<>("initial value");
+            }
+        });
+
+        threadLocal.get().set("new value");
+
+        assertThat(threadLocal.get().get(), is("new value"));
+    }
+
+    @Test public void initialValueSourceIsStatefulOtherThread() throws InterruptedException {
+        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<>(new Supplier<AtomicReference<String>>() {
+            @Override
+            public AtomicReference<String> get() {
+                return new AtomicReference<>("initial value");
+            }
+        });
+
+        final AtomicReference<String> fromThread = new AtomicReference<>();
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                threadLocal.get().set("new value");
+                fromThread.set(threadLocal.get().get());
+            }
+        });
+        thread.start();
+        thread.join();
+
+        assertThat(fromThread.get(), is("new value"));
+    }
+
+    @Test
+    public void removeWorks() {
+        ThreadLocal<String> threadLocal = new ThreadLocal<>("Initial Value");
+        threadLocal.set("New Value");
+        threadLocal.remove();
+        assertThat(threadLocal.get(), is("Initial Value"));
+    }
+
+    @Test
+    public void removeWorksOtherThread() throws InterruptedException {
+        final ThreadLocal<String> threadLocal = new ThreadLocal<>(new Supplier<String>() {
+            @Override
+            public String get() {
+                return Thread.currentThread().getName();
+            }
+        });
+        final AtomicReference<String> fromThread = new AtomicReference<>();
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                threadLocal.set("New Value");
+                threadLocal.remove();
+                fromThread.set(threadLocal.get());
+            }
+        });
+        thread.start();
+        thread.join();
+
+        assertThat(threadLocal.get(), is(Thread.currentThread().getName()));
+        assertThat(fromThread.get(), is(thread.getName()));
     }
 }

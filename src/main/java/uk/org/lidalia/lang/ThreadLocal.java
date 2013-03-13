@@ -49,17 +49,12 @@ public class ThreadLocal<T> {
      */
     public ThreadLocal(final Supplier<T> initialValueCreator) {
         this.initialValueCreator = checkNotNull(initialValueCreator);
-        doSet(initialValueCreator.get());
     }
 
     /**
      * @param value the new value for the calling {@link Thread} - does not affect the value for any other {@link Thread}.
      */
     public void set(final T value) {
-        doSet(value);
-    }
-
-    private void doSet(final T value) {
         contents.put(currentThread(), checkNotNull(value));
     }
 
