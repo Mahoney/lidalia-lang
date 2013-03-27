@@ -11,22 +11,22 @@ import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 public abstract class Task implements Runnable, Callable<Void> {
 
     /**
-     * @return the result of {@link #doRun()}
-     * @throws Exception thrown by {@link #doRun()}
+     * @return the result of {@link #perform()}
+     * @throws Exception thrown by {@link #perform()}
      */
     @Override
     public final Void call() throws Exception { //NOPMD no way of knowing what Exception implementer will throw
-        doRun();
+        perform();
         return null;
     }
 
     /**
-     * @throws Exception thrown by {@link #doRun()} - unchecked
+     * @throws Exception thrown by {@link #perform()} - unchecked
      */
     @Override
     public final void run() {
         try {
-            doRun();
+            perform();
         } catch (Exception e) {
             throwUnchecked(e);
         }
@@ -36,5 +36,5 @@ public abstract class Task implements Runnable, Callable<Void> {
      * Work of this task.
      * @throws Exception
      */
-    public abstract void doRun() throws Exception; //NOPMD no way of knowing what Exception implementer will throw
+    public abstract void perform() throws Exception; //NOPMD no way of knowing what Exception implementer will throw
 }

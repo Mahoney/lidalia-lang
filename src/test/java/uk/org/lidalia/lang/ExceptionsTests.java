@@ -26,12 +26,10 @@ package uk.org.lidalia.lang;
 
 import static org.junit.Assert.assertThat;
 import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
-import static uk.org.lidalia.test.Assert.isNotInstantiable;
-import static uk.org.lidalia.test.ShouldThrow.shouldThrow;
+import static uk.org.lidalia.lang.lidaliatest.Assert.isNotInstantiable;
+import static uk.org.lidalia.lang.lidaliatest.ShouldThrow.shouldThrow;
 
 import org.junit.Test;
-
-import java.util.concurrent.Callable;
 
 public class ExceptionsTests {
 

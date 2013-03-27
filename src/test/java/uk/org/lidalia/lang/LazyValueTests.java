@@ -15,7 +15,6 @@ import org.junit.Test;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -23,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static uk.org.lidalia.test.ShouldThrow.shouldThrow;
+import static uk.org.lidalia.lang.lidaliatest.ShouldThrow.shouldThrow;
 
 public class LazyValueTests {
 

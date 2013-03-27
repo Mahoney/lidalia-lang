@@ -1,13 +1,12 @@
 package uk.org.lidalia.lang;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static uk.org.lidalia.test.ShouldThrow.shouldThrow;
+import static uk.org.lidalia.lang.lidaliatest.ShouldThrow.shouldThrow;
 
 public class TaskTests {
 
@@ -16,7 +15,7 @@ public class TaskTests {
 
         new Task() {
             @Override
-            public void doRun() throws Exception {
+            public void perform() throws Exception {
                 called.set(true);
             }
         }.run();
@@ -32,7 +31,7 @@ public class TaskTests {
             public void run() {
                 new Task() {
                     @Override
-                    public void doRun() throws Exception {
+                    public void perform() throws Exception {
                         throw exception;
                     }
                 }.run();
@@ -45,7 +44,7 @@ public class TaskTests {
 
         new Task() {
             @Override
-            public void doRun() throws Exception {
+            public void perform() throws Exception {
                 called.set(true);
             }
         }.call();
@@ -56,12 +55,12 @@ public class TaskTests {
     @Test public void callThrowsException() {
         final Exception exception = new Exception();
 
-        shouldThrow(exception, new Callable<Void>() {
+        shouldThrow(exception, new Task() {
             @Override
-            public Void call() throws Exception {
-                return new Task() {
+            public void perform() throws Exception {
+                new Task() {
                     @Override
-                    public void doRun() throws Exception {
+                    public void perform() throws Exception {
                         throw exception;
                     }
                 }.call();

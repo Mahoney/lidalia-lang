@@ -16,7 +16,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.org.lidalia.lang.Classes.hasConstructor;
 import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
-import static uk.org.lidalia.test.Assert.isNotInstantiable;
+import static uk.org.lidalia.lang.lidaliatest.Assert.isNotInstantiable;
 
 public class ClassesTests {
 
