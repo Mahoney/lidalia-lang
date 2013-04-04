@@ -1,4 +1,4 @@
-package uk.org.lidalia.lang.lidaliatest;
+package uk.org.lidalia.lang;
 
 import java.lang.reflect.Member;
 
