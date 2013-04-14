@@ -1,0 +1,5 @@
+Lidalia Lang
+
+  A set of utility classes that act as extensions of java.lang for common use cases.
+
+  See the {{{./apidocs/index.html}JavaDocs}} for documentation and the {{{./xref-test/index.html}Test Source}} for examples of usage.
