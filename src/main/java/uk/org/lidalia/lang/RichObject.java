@@ -43,7 +43,7 @@ public abstract class RichObject {
     };
 
     /**
-     * Applies equality rules on the following basis (in addition to the rules in {@link Object#equals(Object)}:
+     * Applies equality rules on the following basis (in addition to the rules in {@link Object#equals(Object)}):
      * <ul>
      * <li> other's runtime class must be the same, a super or a sub type of the runtime class of this instance
      * <li> other's runtime class must have exactly the same set of fields annotated with {@link Identity} as those on the runtime

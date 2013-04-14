@@ -26,6 +26,9 @@ package uk.org.lidalia.lang;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Static utility functions around Exception management.
+ */
 public final class Exceptions {
 
     /**

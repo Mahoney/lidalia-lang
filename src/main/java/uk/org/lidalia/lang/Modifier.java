@@ -2,6 +2,9 @@ package uk.org.lidalia.lang;
 
 import java.lang.reflect.Member;
 
+/**
+ * An enumeration of the various modifiers that can be applied to classes or members.
+ */
 public enum Modifier {
 
     PUBLIC {
@@ -148,6 +151,15 @@ public enum Modifier {
         }
     };
 
+    /**
+     * @param modifiable - the member that may have this modifier
+     * @return true if the member has this modifier, false otherwise
+     */
     public abstract boolean isTrueOf(Member modifiable);
+
+    /**
+     * @param modifiable - the class that may have this modifier
+     * @return true if the class has this modifier, false otherwise
+     */
     public abstract boolean isTrueOf(Class<?> modifiable);
 }
