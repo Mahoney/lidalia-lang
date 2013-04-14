@@ -24,10 +24,11 @@
 
 package uk.org.lidalia.lang;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
-import static uk.org.lidalia.lang.lidaliatest.Assert.isNotInstantiable;
-import static uk.org.lidalia.lang.lidaliatest.ShouldThrow.shouldThrow;
+import static uk.org.lidalia.lang.Assert.isNotInstantiable;
+import static uk.org.lidalia.lang.ShouldThrow.shouldThrow;
 
 import org.junit.Test;
 
@@ -36,18 +37,19 @@ public class ExceptionsTests {
     @Test
     public void throwUncheckedWithCheckedException() {
         final Exception checkedException = new Exception();
-        shouldThrow(checkedException, new Runnable() {
+        Exception actual = shouldThrow(Exception.class, new Runnable() {
             @Override
             public void run() {
                 throwUnchecked(checkedException);
             }
         });
+        assertThat(actual, is(checkedException));
     }
 
     @Test
      public void throwUncheckedWithCheckedExceptionAndReturnStatementToTrickCompiler() {
         final Exception checkedException = new Exception();
-        shouldThrow(checkedException, new Runnable() {
+        Exception actual = shouldThrow(Exception.class, new Runnable() {
             @Override
             public void run() {
                 compilerThinksReturnsString();
@@ -57,6 +59,7 @@ public class ExceptionsTests {
                 return throwUnchecked(checkedException, null);
             }
         });
+        assertThat(actual, is(checkedException));
     }
 
     @Test

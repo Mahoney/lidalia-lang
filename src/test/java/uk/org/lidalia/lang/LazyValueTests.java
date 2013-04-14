@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -22,10 +21,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static uk.org.lidalia.lang.lidaliatest.ShouldThrow.shouldThrow;
+import static uk.org.lidalia.lang.ShouldThrow.shouldThrow;
 
 public class LazyValueTests {
 
+    @SuppressWarnings("unchecked")
     private final Callable<String> supplier = mock(Callable.class);
 
     @Test
@@ -45,12 +45,13 @@ public class LazyValueTests {
     public void throwsSourceException() throws Exception {
         final Exception expectedException = new Exception();
         given(supplier.call()).willThrow(expectedException);
-        shouldThrow(expectedException, new Runnable() {
+        final Exception actual = shouldThrow(Exception.class, new Runnable() {
             @Override
             public void run() {
                 new LazyValue<>(supplier).call();
             }
         });
+        assertThat(actual, is(expectedException));
     }
 
     @Test

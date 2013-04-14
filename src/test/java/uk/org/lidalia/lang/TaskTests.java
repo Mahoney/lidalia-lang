@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static uk.org.lidalia.lang.lidaliatest.ShouldThrow.shouldThrow;
+import static uk.org.lidalia.lang.ShouldThrow.shouldThrow;
 
 public class TaskTests {
 
@@ -26,7 +26,7 @@ public class TaskTests {
     @Test public void runThrowsException() {
         final Exception exception = new Exception();
 
-        shouldThrow(exception, new Runnable() {
+        final Exception actual = shouldThrow(Exception.class, new Runnable() {
             @Override
             public void run() {
                 new Task() {
@@ -37,6 +37,7 @@ public class TaskTests {
                 }.run();
             }
         });
+        assertThat(actual, is(exception));
     }
 
     @Test public void callCallsDoRun() throws Exception {
@@ -55,7 +56,7 @@ public class TaskTests {
     @Test public void callThrowsException() {
         final Exception exception = new Exception();
 
-        shouldThrow(exception, new Task() {
+        final Exception actual = shouldThrow(Exception.class, new Task() {
             @Override
             public void perform() throws Exception {
                 new Task() {
@@ -66,5 +67,6 @@ public class TaskTests {
                 }.call();
             }
         });
+        assertThat(actual, is(exception));
     }
 }

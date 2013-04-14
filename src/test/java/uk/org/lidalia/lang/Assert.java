@@ -1,4 +1,4 @@
-package uk.org.lidalia.lang.lidaliatest;
+package uk.org.lidalia.lang;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -10,33 +10,31 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
-import uk.org.lidalia.lang.Modifier;
-
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
-import static uk.org.lidalia.lang.lidaliatest.CombinableMatcher.both;
+import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 
-public final class Assert {
+final class Assert {
 
-    public static Matcher<Class<?>> isNotInstantiable() {
-        return both(aClassWhoseSuperClass(is(equalTo(Object.class))))
-                .and(aClassWhoseSetOfConstructors(both(
+    static Matcher<Class<?>> isNotInstantiable() {
+        return CombinableMatcher.both(aClassWhoseSuperClass(is(equalTo(Object.class))))
+                .and(aClassWhoseSetOfConstructors(CombinableMatcher.both(
                         is(Assert.<List<Constructor<?>>>aCollectionWhoseLength(is(1))))
-                        .and(is(Assert.<List<Constructor<?>>, Constructor<?>>aListWhoseElementAtIndex(0, both(
+                        .and(is(Assert.<List<Constructor<?>>, Constructor<?>>aListWhoseElementAtIndex(0, CombinableMatcher.both(
                                 is(aConstructorWhoseParameterTypes(is(Assert.<List<Class<?>>>aCollectionWhoseLength(is(0))))))
                                 .and(isAMemberWithModifier(Modifier.PRIVATE))
-                                .and(aConstructorWhoseThrownException(both(
+                                .and(aConstructorWhoseThrownException(CombinableMatcher.both(
                                         isA(UnsupportedOperationException.class))
                                         .and(is(aThrowableWhoseMessage(is("Not instantiable")))))))))));
     }
 
-    public static <U, T extends U> FeatureMatcher<Class<? extends T>, Class<? extends U>> aClassWhoseSuperClass(
+    private static <U, T extends U> FeatureMatcher<Class<? extends T>, Class<? extends U>> aClassWhoseSuperClass(
             final Matcher<? extends Class<? extends U>> classMatcher) {
         return new FeatureMatcher<Class<? extends T>, Class<? extends U>>(
                 classMatcher, "a Class whose super class", "'s super class") {
-            @Override
+            @Override @SuppressWarnings("unchecked")
             protected Class<? extends U> featureValueOf(final Class<? extends T> actual) {
                 return (Class<? extends U>) actual.getSuperclass();
             }
@@ -54,7 +52,7 @@ public final class Assert {
         };
     }
 
-    public static <T extends Collection<?>> Matcher<T> aCollectionWhoseLength(final Matcher<Integer> integerMatcher) {
+    private static <T extends Collection<?>> Matcher<T> aCollectionWhoseLength(final Matcher<Integer> integerMatcher) {
         return new FeatureMatcher<T, Integer>(integerMatcher, "a Collection whose length", "'s length") {
             @Override
             protected Integer featureValueOf(final T actual) {
@@ -63,7 +61,7 @@ public final class Assert {
         };
     }
 
-    public static <T extends List<? extends E>, E> Matcher<T> aListWhoseElementAtIndex(
+    private static <T extends List<? extends E>, E> Matcher<T> aListWhoseElementAtIndex(
             final Integer index, final Matcher<E> matcher) {
         return new FeatureMatcher<T, E>(matcher, "a List whose element at index " + index, "'s element at index " + index) {
             @Override
@@ -77,7 +75,7 @@ public final class Assert {
         };
     }
 
-    public static <T extends Member> Matcher<T> isAMemberWithModifier(final Modifier modifier) {
+    private static <T extends Member> Matcher<T> isAMemberWithModifier(final Modifier modifier) {
         return new TypeSafeDiagnosingMatcher<T>() {
 
             @Override
@@ -133,15 +131,6 @@ public final class Assert {
                 return actual.getMessage();
             }
         };
-    }
-
-    private static <T> T throwUnchecked(final Throwable toThrow, final T shouldBeNullAndNotUsed) { // NOPMD param is used for type
-        Assert.<RuntimeException>doThrowUnchecked(toThrow);
-        throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
-    }
-
-    private static <T extends Throwable> void doThrowUnchecked(final Throwable toThrow) throws T {
-        throw (T) toThrow;
     }
 
     private Assert() {
