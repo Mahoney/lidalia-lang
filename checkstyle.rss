@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>Lidalia Lang - Checkstyle report</title>
+    <link>http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang</link>
+    <description>Lidalia Lang - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2006 - 2013</copyright>
+    <item>
+      <title>File: 9,
+             Errors: 0,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html#uk.org.lidalia.lang.WrappedValue.java">uk/org/lidalia/lang/WrappedValue.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html#uk.org.lidalia.lang.RichObject.java">uk/org/lidalia/lang/RichObject.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html#uk.org.lidalia.lang.Modifier.java">uk/org/lidalia/lang/Modifier.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html#uk.org.lidalia.lang.Identity.java">uk/org/lidalia/lang/Identity.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html#uk.org.lidalia.lang.LazyValue.java">uk/org/lidalia/lang/LazyValue.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html#uk.org.lidalia.lang.Exceptions.java">uk/org/lidalia/lang/Exceptions.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html#uk.org.lidalia.lang.ThreadLocal.java">uk/org/lidalia/lang/ThreadLocal.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html#uk.org.lidalia.lang.Task.java">uk/org/lidalia/lang/Task.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://projects.lidalia.org.uk/lidalia-lang/lidalia-lang/checkstyle.html#uk.org.lidalia.lang.Classes.java">uk/org/lidalia/lang/Classes.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

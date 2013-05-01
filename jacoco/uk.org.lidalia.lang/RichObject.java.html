@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>RichObject.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Lidalia Lang</a> &gt; <a href="index.html" class="el_package">uk.org.lidalia.lang</a> &gt; <span class="el_source">RichObject.java</span></div><h1>RichObject.java</h1><pre class="source lang-java linenums">package uk.org.lidalia.lang;
+
+import java.lang.reflect.Field;
+import java.security.PrivilegedAction;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+
+import static com.google.common.base.Optional.fromNullable;
+import static java.security.AccessController.doPrivileged;
+import static java.util.Arrays.asList;
+import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
+import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
+
+/**
+ * A class that provides implementations of {@link #equals(Object)}, {@link #hashCode()} and {@link #toString()} for its subtypes.
+ * &lt;p&gt;
+ * These implementations are based on annotating the fields of the subtypes with the {@link Identity} annotation.
+ */
+<span class="fc" id="L30">public abstract class RichObject {</span>
+
+    private static final int PRIME = 37;
+    private static final int INITIAL_HASHCODE_VALUE = 17;
+
+<span class="fc" id="L35">    private static final LoadingCache&lt;Class&lt;?&gt;, FluentIterable&lt;FieldFacade&gt;&gt; IDENTITY_FIELDS =</span>
+            CacheBuilder.newBuilder().weakKeys().softValues().build(new IdentityFieldLoader());
+<span class="fc" id="L37">    private static final Joiner FIELD_JOINER = Joiner.on(&quot;,&quot;);</span>
+<span class="fc" id="L38">    private static final Function&lt;Object, Integer&gt; toHashCode = new Function&lt;Object, Integer&gt;() {</span>
+        @Override
+        public Integer apply(final Object fieldValue) {
+<span class="fc" id="L41">            return fieldValue.hashCode();</span>
+        }
+    };
+
+    /**
+     * Applies equality rules on the following basis (in addition to the rules in {@link Object#equals(Object)}):
+     * &lt;ul&gt;
+     * &lt;li&gt; other's runtime class must be the same, a super or a sub type of the runtime class of this instance
+     * &lt;li&gt; other's runtime class must have exactly the same set of fields annotated with {@link Identity} as those on the runtime
+     *      class of this instance, where the set of fields in each case comprises those on the class and all of its superclasses
+     * &lt;li&gt; the value of any field annotated with {@link Identity} on this must be equal to the value of the same field on other
+     * &lt;/ul&gt;
+     * &lt;p&gt;
+     * The practical result of this is that an instance of subtype B of subtype A of RichObject can only be equal to an instance
+     * of subtype A if B does not annotate any of its fields with {@link Identity}.
+     *
+     * @param other the object to compare against
+     * @return true if the other type is logically equal to this
+     */
+    @Override public final boolean equals(final Object other) {
+        // Usual equals checks
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (other == this) {</span>
+<span class="fc" id="L63">            return true;</span>
+        }
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (other == null) {</span>
+<span class="fc" id="L66">            return false;</span>
+        }
+
+        // One of the two must be a subtype of the other
+<span class="fc bfc" id="L70" title="All 4 branches covered.">        if (!(other instanceof RichObject) || !inSameClassHierarchy(getClass(), other.getClass())) {</span>
+<span class="fc" id="L71">            return false;</span>
+        }
+
+<span class="fc" id="L74">        final RichObject that = (RichObject) other;</span>
+
+        // They must have precisely the same set of identity members to meet the
+        // symmetric &amp; transitive requirement of equals
+<span class="fc" id="L78">        final FluentIterable&lt;FieldFacade&gt; fieldsOfThis = fields();</span>
+<span class="fc bfc" id="L79" title="All 4 branches covered.">        return fieldsOfThis.toImmutableSet().equals(that.fields().toImmutableSet())</span>
+                &amp;&amp; fieldsOfThis.allMatch(hasEqualValueIn(that));
+    }
+
+    private FluentIterable&lt;FieldFacade&gt; fields() {
+        try {
+<span class="fc" id="L85">            return IDENTITY_FIELDS.get(getClass());</span>
+<span class="nc" id="L86">        } catch (ExecutionException e) {</span>
+<span class="nc" id="L87">            return throwUnchecked(e.getCause(), null);</span>
+        }
+    }
+
+    private Predicate&lt;FieldFacade&gt; hasEqualValueIn(final RichObject other) {
+<span class="fc" id="L92">        return new Predicate&lt;FieldFacade&gt;() {</span>
+            @Override
+            public boolean apply(final FieldFacade field) {
+<span class="fc" id="L95">                return valueOf(field).equals(other.valueOf(field));</span>
+            }
+        };
+    }
+
+    /**
+     * Default implementation of hashCode - can be overridden to provide more efficient ones provided the contract specified
+     * in {@link Object#hashCode()} is maintained with respect to {@link #equals(Object)}.
+     *
+     * @return hash code computed from the hashes of all the fields annotated with {@link Identity}
+     */
+    @Override public int hashCode() {
+<span class="fc" id="L107">        int result = INITIAL_HASHCODE_VALUE;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        for (final FieldFacade field : fields()) {</span>
+<span class="fc" id="L109">            final int toAdd = valueOf(field).transform(toHashCode).or(0);</span>
+<span class="fc" id="L110">            result = PRIME * result + toAdd;</span>
+<span class="fc" id="L111">        }</span>
+<span class="fc" id="L112">        return result;</span>
+    }
+
+    /**
+     * Default implementation of toString.
+     *
+     * @return a string in the form ClassName[field1=value1,field2=value2] where the fields are those annotated with
+     * {@link Identity}
+     */
+    @Override public String toString() {
+<span class="fc" id="L122">        final Iterable&lt;String&gt; fieldsAsStrings = fields().transform(toStringValueOfField());</span>
+<span class="fc" id="L123">        return getClass().getSimpleName()+&quot;[&quot;+FIELD_JOINER.join(fieldsAsStrings)+&quot;]&quot;;</span>
+    }
+
+    private Function&lt;FieldFacade, String&gt; toStringValueOfField() {
+<span class="fc" id="L127">        return new Function&lt;FieldFacade, String&gt;() {</span>
+            @Override
+            public String apply(final FieldFacade field) {
+<span class="fc" id="L130">                return field.getName() + &quot;=&quot; + valueOf(field).or(&quot;absent&quot;);</span>
+            }
+        };
+    }
+
+    private Optional&lt;Object&gt; valueOf(final FieldFacade field) {
+<span class="fc" id="L136">        return field.valueOn(this);</span>
+    }
+
+<span class="fc" id="L139">    private static class IdentityFieldLoader extends CacheLoader&lt;Class&lt;?&gt;, FluentIterable&lt;FieldFacade&gt;&gt; {</span>
+
+        @Override
+        public FluentIterable&lt;FieldFacade&gt; load(final Class&lt;?&gt; key) {
+<span class="fc" id="L143">            return FluentIterable.from(doLoad(key));</span>
+        }
+
+<span class="fc" id="L146">        private static final Predicate&lt;FieldFacade&gt; onlyIdentityFields = new Predicate&lt;FieldFacade&gt;() {</span>
+            @Override
+            public boolean apply(final FieldFacade field) {
+<span class="fc" id="L149">                return field.isIdentityField();</span>
+            }
+        };
+
+<span class="fc" id="L153">        private static final Function&lt;Field, FieldFacade&gt; toFieldFacade = new Function&lt;Field, FieldFacade&gt;() {</span>
+            @Override
+            public FieldFacade apply(final Field field) {
+<span class="fc" id="L156">                return new FieldFacade(field);</span>
+            }
+        };
+
+<span class="fc" id="L160">        private static final Function&lt;Class&lt;?&gt;, Set&lt;FieldFacade&gt;&gt; toFieldSet = new Function&lt;Class&lt;?&gt;, Set&lt;FieldFacade&gt;&gt;() {</span>
+            @Override
+            public Set&lt;FieldFacade&gt; apply(final Class&lt;?&gt; input) {
+<span class="fc" id="L163">                return doLoad(input);</span>
+            }
+        };
+
+        private static Set&lt;FieldFacade&gt; doLoad(final Class&lt;?&gt; key) {
+<span class="fc" id="L168">            final ImmutableSet&lt;FieldFacade&gt; localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))</span>
+                    .transform(toFieldFacade)
+                    .filter(onlyIdentityFields)
+                    .toImmutableSet();
+<span class="fc" id="L172">            final Optional&lt;? extends Class&lt;?&gt;&gt; superClass = fromNullable(key.getSuperclass());</span>
+<span class="fc" id="L173">            final Set&lt;FieldFacade&gt; superIdentityFieldSet = superClass.transform(toFieldSet).or(ImmutableSet.&lt;FieldFacade&gt;of());</span>
+<span class="fc" id="L174">            return Sets.union(localIdentityFieldSet, superIdentityFieldSet);</span>
+        }
+    }
+
+<span class="fc" id="L178">    private static class FieldFacade extends WrappedValue {</span>
+        private final Field field;
+
+        FieldFacade(final Field field) {
+<span class="fc" id="L182">            super(field);</span>
+<span class="fc" id="L183">            this.field = field;</span>
+<span class="fc" id="L184">        }</span>
+
+        public Optional&lt;Object&gt; valueOn(final Object target) {
+            try {
+<span class="fc bfc" id="L188" title="All 2 branches covered.">                if (!field.isAccessible()) {</span>
+<span class="fc" id="L189">                    makeAccessible();</span>
+                }
+<span class="fc" id="L191">                return fromNullable(field.get(target));</span>
+<span class="nc" id="L192">            } catch (IllegalAccessException e) {</span>
+<span class="nc" id="L193">                throw new IllegalStateException(field+&quot; was not accessible; all fields should be accessible&quot;, e);</span>
+            }
+        }
+
+        public String getName() {
+<span class="fc" id="L198">            return field.getName();</span>
+        }
+
+        public boolean isIdentityField() {
+<span class="fc" id="L202">            return field.isAnnotationPresent(Identity.class);</span>
+        }
+
+        private void makeAccessible() {
+<span class="fc" id="L206">            doPrivileged(new PrivilegedAction&lt;Void&gt;() {</span>
+                @Override
+                public Void run() {
+<span class="fc" id="L209">                    field.setAccessible(true);</span>
+<span class="fc" id="L210">                    return null;</span>
+                }
+            });
+<span class="fc" id="L213">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.2.201302030002</span></div></body></html>
