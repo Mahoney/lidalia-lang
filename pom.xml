@@ -15,6 +15,7 @@
 
   <name>Lidalia Lang</name>
   <description>Additions to java.lang</description>
+  <url>http://projects.lidalia.org.uk/${project.artifactId}</url>
   <inceptionYear>2006</inceptionYear>
 
   <scm>
