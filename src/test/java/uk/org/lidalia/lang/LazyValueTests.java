@@ -1,6 +1,7 @@
 package uk.org.lidalia.lang;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -8,12 +9,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.util.concurrent.Uninterruptibles;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -52,6 +58,28 @@ public class LazyValueTests {
             }
         });
         assertThat(actual, is(expectedException));
+    }
+
+    @Test
+    public void handlesInterruption() throws Exception {
+        final LazyValue<String> lazyValue = new LazyValue<>(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                Uninterruptibles.sleepUninterruptibly(200, MILLISECONDS);
+                return "result";
+            }
+        });
+        final AtomicReference<String> result = new AtomicReference<>();
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                result.set(lazyValue.call());
+            }
+        });
+        t.start();
+        t.interrupt();
+        t.join();
+        assertThat(result.get(), is("result"));
     }
 
     @Test

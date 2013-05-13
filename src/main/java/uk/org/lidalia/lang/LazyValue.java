@@ -1,8 +1,10 @@
 package uk.org.lidalia.lang;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
+import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
 import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 
 /**
@@ -32,8 +34,8 @@ public class LazyValue<T> implements Callable<T> {
     public T call() {
         supplier.run();
         try {
-            return supplier.get();
-        } catch (Exception e) {
+            return getUninterruptibly(supplier);
+        } catch (ExecutionException e) {
             return throwUnchecked(e.getCause(), null);
         }
     }
