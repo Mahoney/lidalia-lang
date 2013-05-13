@@ -5,7 +5,7 @@ import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
 
 /**
  * Convenience class for types that represent a higher level abstraction over a single lower level type; for instance
- * a class representing a network Port might extend {@code WrappedValue<Integer>}.
+ * a class representing a network Port might extend {@code WrappedValue} and pass an {@code java.lang.Integer} as the value.
  *
  * Provides implementations of {@link #equals(Object)}, {@link #toString()} and {@link #hashCode()} based on the value
  * of the wrapped instance.
@@ -14,7 +14,7 @@ public abstract class WrappedValue {
 
     private final Object wrapped;
 
-    public WrappedValue(final Object wrapped) {
+    protected WrappedValue(final Object wrapped) {
         this.wrapped = checkNotNull(wrapped);
     }
 

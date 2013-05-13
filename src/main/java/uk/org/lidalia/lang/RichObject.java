@@ -76,7 +76,7 @@ public abstract class RichObject {
         // They must have precisely the same set of identity members to meet the
         // symmetric & transitive requirement of equals
         final FluentIterable<FieldFacade> fieldsOfThis = fields();
-        return fieldsOfThis.toImmutableSet().equals(that.fields().toImmutableSet())
+        return fieldsOfThis.toSet().equals(that.fields().toSet())
                 && fieldsOfThis.allMatch(hasEqualValueIn(that));
     }
 
@@ -168,7 +168,7 @@ public abstract class RichObject {
             final ImmutableSet<FieldFacade> localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))
                     .transform(toFieldFacade)
                     .filter(onlyIdentityFields)
-                    .toImmutableSet();
+                    .toSet();
             final Optional<? extends Class<?>> superClass = fromNullable(key.getSuperclass());
             final Set<FieldFacade> superIdentityFieldSet = superClass.transform(toFieldSet).or(ImmutableSet.<FieldFacade>of());
             return Sets.union(localIdentityFieldSet, superIdentityFieldSet);
