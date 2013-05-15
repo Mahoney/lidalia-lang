@@ -39,4 +39,9 @@ public class LazyValue<T> implements Callable<T> {
             return throwUnchecked(e.getCause(), null);
         }
     }
+
+    @Override
+    public String toString() {
+        return supplier.isDone() ? call().toString() : "not yet evaluated";
+    }
 }

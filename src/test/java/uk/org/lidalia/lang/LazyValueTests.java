@@ -117,4 +117,22 @@ public class LazyValueTests {
         }), is(true));
         verify(supplier, times(1)).call();
     }
+
+    @Test
+    public void toStringWhenNotYetEvaluated() throws Exception {
+        given(supplier.call()).willReturn("a value");
+        final LazyValue<String> lazyValue = new LazyValue<>(supplier);
+
+        assertThat(lazyValue.toString(), is("not yet evaluated"));
+    }
+
+    @Test
+    public void toStringWhenEvaluated() throws Exception {
+        given(supplier.call()).willReturn("expected value");
+        final LazyValue<String> lazyValue = new LazyValue<>(supplier);
+
+        lazyValue.call();
+
+        assertThat(lazyValue.toString(), is("expected value"));
+    }
 }
