@@ -5,6 +5,8 @@ A set of utility classes that act as extensions of java.lang for common use case
 See the [JavaDocs](./apidocs/index.html) for full documentation and the [Test Source](./xref-test/index.html) for complete
 examples of usage. Below are some examples from some of the more common classes.
 
+Details on how to depend on this library in your favourite build tool can be found [here](./dependency-info.html).
+
 ### Examples
 
 #### Making Checked Exceptions Unchecked
