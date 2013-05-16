@@ -76,7 +76,7 @@ import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
         // They must have precisely the same set of identity members to meet the
         // symmetric &amp; transitive requirement of equals
 <span class="fc" id="L78">        final FluentIterable&lt;FieldFacade&gt; fieldsOfThis = fields();</span>
-<span class="fc bfc" id="L79" title="All 4 branches covered.">        return fieldsOfThis.toImmutableSet().equals(that.fields().toImmutableSet())</span>
+<span class="fc bfc" id="L79" title="All 4 branches covered.">        return fieldsOfThis.toSet().equals(that.fields().toSet())</span>
                 &amp;&amp; fieldsOfThis.allMatch(hasEqualValueIn(that));
     }
 
@@ -168,7 +168,7 @@ import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 <span class="fc" id="L168">            final ImmutableSet&lt;FieldFacade&gt; localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))</span>
                     .transform(toFieldFacade)
                     .filter(onlyIdentityFields)
-                    .toImmutableSet();
+                    .toSet();
 <span class="fc" id="L172">            final Optional&lt;? extends Class&lt;?&gt;&gt; superClass = fromNullable(key.getSuperclass());</span>
 <span class="fc" id="L173">            final Set&lt;FieldFacade&gt; superIdentityFieldSet = superClass.transform(toFieldSet).or(ImmutableSet.&lt;FieldFacade&gt;of());</span>
 <span class="fc" id="L174">            return Sets.union(localIdentityFieldSet, superIdentityFieldSet);</span>

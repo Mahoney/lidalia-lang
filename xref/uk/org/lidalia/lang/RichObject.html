@@ -86,7 +86,7 @@
 <a class="jxr_linenumber" name="76" href="#76">76</a>          <em class="jxr_comment">// They must have precisely the same set of identity members to meet the</em>
 <a class="jxr_linenumber" name="77" href="#77">77</a>          <em class="jxr_comment">// symmetric &amp; transitive requirement of equals</em>
 <a class="jxr_linenumber" name="78" href="#78">78</a>          <strong class="jxr_keyword">final</strong> FluentIterable&lt;FieldFacade&gt; fieldsOfThis = fields();
-<a class="jxr_linenumber" name="79" href="#79">79</a>          <strong class="jxr_keyword">return</strong> fieldsOfThis.toImmutableSet().equals(that.fields().toImmutableSet())
+<a class="jxr_linenumber" name="79" href="#79">79</a>          <strong class="jxr_keyword">return</strong> fieldsOfThis.toSet().equals(that.fields().toSet())
 <a class="jxr_linenumber" name="80" href="#80">80</a>                  &amp;&amp; fieldsOfThis.allMatch(hasEqualValueIn(that));
 <a class="jxr_linenumber" name="81" href="#81">81</a>      }
 <a class="jxr_linenumber" name="82" href="#82">82</a>  
@@ -178,7 +178,7 @@
 <a class="jxr_linenumber" name="168" href="#168">168</a>             <strong class="jxr_keyword">final</strong> ImmutableSet&lt;FieldFacade&gt; localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))
 <a class="jxr_linenumber" name="169" href="#169">169</a>                     .transform(toFieldFacade)
 <a class="jxr_linenumber" name="170" href="#170">170</a>                     .filter(onlyIdentityFields)
-<a class="jxr_linenumber" name="171" href="#171">171</a>                     .toImmutableSet();
+<a class="jxr_linenumber" name="171" href="#171">171</a>                     .toSet();
 <a class="jxr_linenumber" name="172" href="#172">172</a>             <strong class="jxr_keyword">final</strong> Optional&lt;? <strong class="jxr_keyword">extends</strong> Class&lt;?&gt;&gt; superClass = fromNullable(key.getSuperclass());
 <a class="jxr_linenumber" name="173" href="#173">173</a>             <strong class="jxr_keyword">final</strong> Set&lt;FieldFacade&gt; superIdentityFieldSet = superClass.transform(toFieldSet).or(ImmutableSet.&lt;FieldFacade&gt;of());
 <a class="jxr_linenumber" name="174" href="#174">174</a>             <strong class="jxr_keyword">return</strong> Sets.union(localIdentityFieldSet, superIdentityFieldSet);
