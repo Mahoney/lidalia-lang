@@ -42,6 +42,7 @@ public class LazyValue<T> implements Callable<T> {
 
     @Override
     public String toString() {
-        return supplier.isDone() ? call().toString() : "not yet evaluated";
+        if (supplier.isDone()) return call().toString();
+        else return "not yet evaluated";
     }
 }
