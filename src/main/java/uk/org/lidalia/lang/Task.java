@@ -15,7 +15,8 @@ public abstract class Task implements Runnable, Callable<Void> {
      * @throws Exception thrown by {@link #perform()}
      */
     @Override
-    public final Void call() throws Exception { //NOPMD no way of knowing what Exception implementer will throw
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    public final Void call() throws Exception {
         perform();
         return null;
     }
@@ -36,5 +37,6 @@ public abstract class Task implements Runnable, Callable<Void> {
      * Work of this task.
      * @throws Exception
      */
-    public abstract void perform() throws Exception; //NOPMD no way of knowing what Exception implementer will throw
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    public abstract void perform() throws Exception;
 }
