@@ -80,7 +80,7 @@ final class Assert {
 
             @Override
             protected boolean matchesSafely(final T item, final Description mismatchDescription) {
-                final boolean matches = modifier.isTrueOf(item);
+                final boolean matches = modifier.existsOn(item);
                 if (!matches) {
                     mismatchDescription.appendValue(item).appendText(" did not have modifier ").appendValue(modifier);
                 }
