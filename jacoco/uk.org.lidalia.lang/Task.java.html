@@ -15,9 +15,10 @@ import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
      * @throws Exception thrown by {@link #perform()}
      */
     @Override
-    public final Void call() throws Exception { //NOPMD no way of knowing what Exception implementer will throw
-<span class="fc" id="L19">        perform();</span>
-<span class="fc" id="L20">        return null;</span>
+    @SuppressWarnings(&quot;PMD.SignatureDeclareThrowsException&quot;)
+    public final Void call() throws Exception {
+<span class="fc" id="L20">        perform();</span>
+<span class="fc" id="L21">        return null;</span>
     }
 
     /**
@@ -26,16 +27,17 @@ import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
     @Override
     public final void run() {
         try {
-<span class="fc" id="L29">            perform();</span>
-<span class="nc" id="L30">        } catch (Exception e) {</span>
-<span class="nc" id="L31">            throwUnchecked(e);</span>
-<span class="fc" id="L32">        }</span>
-<span class="fc" id="L33">    }</span>
+<span class="fc" id="L30">            perform();</span>
+<span class="nc" id="L31">        } catch (Exception e) {</span>
+<span class="nc" id="L32">            throwUnchecked(e);</span>
+<span class="fc" id="L33">        }</span>
+<span class="fc" id="L34">    }</span>
 
     /**
      * Work of this task.
      * @throws Exception
      */
-    public abstract void perform() throws Exception; //NOPMD no way of knowing what Exception implementer will throw
+    @SuppressWarnings(&quot;PMD.SignatureDeclareThrowsException&quot;)
+    public abstract void perform() throws Exception;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.2.201302030002</span></div></body></html>

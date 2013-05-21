@@ -42,7 +42,8 @@ public class LazyValue&lt;T&gt; implements Callable&lt;T&gt; {
 
     @Override
     public String toString() {
-<span class="fc bfc" id="L45" title="All 2 branches covered.">        return supplier.isDone() ? call().toString() : &quot;not yet evaluated&quot;;</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (supplier.isDone()) return call().toString();</span>
+<span class="fc" id="L46">        else return &quot;not yet evaluated&quot;;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.2.201302030002</span></div></body></html>

@@ -14,14 +14,14 @@
 <a class="jxr_linenumber" name="4" href="#4">4</a>   
 <a class="jxr_linenumber" name="5" href="#5">5</a>   <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../uk/org/lidalia/lang/ShouldThrow.html">ShouldThrow</a> {
 <a class="jxr_linenumber" name="6" href="#6">6</a>   
-<a class="jxr_linenumber" name="7" href="#7">7</a>       @SuppressWarnings(<span class="jxr_string">"unchecked"</span>)
+<a class="jxr_linenumber" name="7" href="#7">7</a>       @SuppressWarnings({ <span class="jxr_string">"unchecked"</span>, <span class="jxr_string">"PMD.AvoidCatchingThrowable"</span> })
 <a class="jxr_linenumber" name="8" href="#8">8</a>       <strong class="jxr_keyword">static</strong> &lt;ThrowableType <strong class="jxr_keyword">extends</strong> Throwable&gt; ThrowableType shouldThrow(
 <a class="jxr_linenumber" name="9" href="#9">9</a>               <strong class="jxr_keyword">final</strong> Class&lt;ThrowableType&gt; expectedThrowableType,
 <a class="jxr_linenumber" name="10" href="#10">10</a>              <strong class="jxr_keyword">final</strong> Runnable workThatShouldThrowThrowable) {
 <a class="jxr_linenumber" name="11" href="#11">11</a>          <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="12" href="#12">12</a>              workThatShouldThrowThrowable.run();
 <a class="jxr_linenumber" name="13" href="#13">13</a>              <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> AssertionError(<span class="jxr_string">"No exception thrown"</span>);
-<a class="jxr_linenumber" name="14" href="#14">14</a>          } <strong class="jxr_keyword">catch</strong> (<strong class="jxr_keyword">final</strong> Throwable actualThrowableThrown) { <em class="jxr_comment">// NOPMD Throwable is thrown if it was not expected</em>
+<a class="jxr_linenumber" name="14" href="#14">14</a>          } <strong class="jxr_keyword">catch</strong> (<strong class="jxr_keyword">final</strong> Throwable actualThrowableThrown) {
 <a class="jxr_linenumber" name="15" href="#15">15</a>              <strong class="jxr_keyword">if</strong> (!expectedThrowableType.isInstance(actualThrowableThrown)) {
 <a class="jxr_linenumber" name="16" href="#16">16</a>                  throwUnchecked(actualThrowableThrown);
 <a class="jxr_linenumber" name="17" href="#17">17</a>              }
