@@ -29,8 +29,8 @@ public final class Classes {
      */
     public static boolean hasConstructor(final Class<?> type, final Class<?>... parameterTypes) {
         try {
-            final Constructor<?> constructor = type.getConstructor(parameterTypes);
-            return constructor != null;
+            type.getConstructor(parameterTypes);
+            return true;
         } catch (NoSuchMethodException e) {
             return false;
         }
