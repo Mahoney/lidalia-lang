@@ -1,7 +1,5 @@
 package uk.org.lidalia.lang;
 
-import java.lang.reflect.Constructor;
-
 /**
  * A collection of methods that could conveniently exist on {@link Class} but don't.
  */
