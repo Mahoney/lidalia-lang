@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="uk.org.lidalia.lang.ModifierTests" time="0.002" tests="42" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib"/>
+    <property name="java.vm.version" value="23.7-b01"/>
+    <property name="gopherProxySet" value="false"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="java.vendor.url" value="http://java.oracle.com/"/>
+    <property name="path.separator" value=":"/>
+    <property name="guice.disable.misplaced.annotation.check" value="true"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="user.country" value="GB"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="/Users/Robert/Workspaces/Lidalia Utilities/lidalia-lang"/>
+    <property name="java.runtime.version" value="1.7.0_15-b03"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment"/>
+    <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/endorsed"/>
+    <property name="os.arch" value="x86_64"/>
+    <property name="java.io.tmpdir" value="/var/folders/zb/_y5nzv452rzcyyw8qfs34stc0000gn/T/"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="classworlds.conf" value="/usr/share/maven/bin/m2.conf"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/Users/Robert/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="51.0"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="os.version" value="10.8.3"/>
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="user.home" value="/Users/Robert"/>
+    <property name="user.timezone" value="Europe/London"/>
+    <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob"/>
+    <property name="java.specification.version" value="1.7"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="user.name" value="Robert"/>
+    <property name="java.class.path" value="/usr/share/maven/boot/plexus-classworlds-2.4.jar"/>
+    <property name="java.vm.specification.version" value="1.7"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher clean install"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="user.language" value="en"/>
+    <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="1.7.0_15"/>
+    <property name="java.ext.dirs" value="/Users/Robert/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/ext:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java"/>
+    <property name="sun.boot.class.path" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/lib/JObjC.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home/jre/classes"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="maven.home" value="/usr/share/maven"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="sun.cpu.isalist" value=""/>
+  </properties>
+  <testcase name="[0] PUBLIC, class uk.org.lidalia.lang.ModifierTests$publicClass (modifierExistsOnClass)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[1] PRIVATE, class uk.org.lidalia.lang.ModifierTests$privateClass (modifierExistsOnClass)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[2] PROTECTED, class uk.org.lidalia.lang.ModifierTests$protectedClass (modifierExistsOnClass)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[3] STATIC, class uk.org.lidalia.lang.ModifierTests$staticClass (modifierExistsOnClass)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[4] FINAL, class uk.org.lidalia.lang.ModifierTests$finalClass (modifierExistsOnClass)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[5] INTERFACE, interface uk.org.lidalia.lang.ModifierTests$interfaceClass (modifierExistsOnClass)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[6] ABSTRACT, class uk.org.lidalia.lang.ModifierTests$abstractClass (modifierExistsOnClass)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[0] PUBLIC (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[1] PRIVATE (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[2] PROTECTED (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[3] STATIC (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[4] FINAL (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[5] SYNCHRONIZED (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[6] VOLATILE (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[7] TRANSIENT (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[8] NATIVE (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[9] INTERFACE (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[10] ABSTRACT (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[11] STRICT (modifierDoesNotExistOnClassWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[0] PUBLIC (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[1] PRIVATE (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[2] PROTECTED (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[3] STATIC (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[4] FINAL (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[5] SYNCHRONIZED (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[6] VOLATILE (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[7] TRANSIENT (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[8] NATIVE (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[9] INTERFACE (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[10] ABSTRACT (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[11] STRICT (modifierDoesNotExistOnMemberWithNoModifier)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[0] PUBLIC, public byte uk.org.lidalia.lang.ModifierTests.publicField (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[1] PRIVATE, private byte uk.org.lidalia.lang.ModifierTests.privateField (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[2] PROTECTED, protected byte uk.org.lidalia.lang.ModifierTests.protectedField (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[3] STATIC, static byte uk.org.lidalia.lang.ModifierTests.staticField (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[4] FINAL, final byte uk.org.lidalia.lang.ModifierTests.finalField (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[5] SYNCHRONIZED, synchronized void uk.org.lidalia.lang.ModifierTests.synchronizedMethod[] (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[6] VOLATILE, volatile byte uk.org.lidalia.lang.ModifierTests.volatileField (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[7] TRANSIENT, transient byte uk.org.lidalia.lang.ModifierTests.transientField (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="[8] NATIVE, native void uk.org.lidalia.lang.ModifierTests.nativeMethod[] (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0.001"/>
+  <testcase name="[9] STRICT, strictfp void uk.org.lidalia.lang.ModifierTests.strictMethod[] (modifierExistsOnMember)" classname="uk.org.lidalia.lang.ModifierTests" time="0"/>
+  <testcase name="strictClassDoesNotHaveStrictModifier" classname="uk.org.lidalia.lang.ModifierTests" time="0.001"/>
+</testsuite>

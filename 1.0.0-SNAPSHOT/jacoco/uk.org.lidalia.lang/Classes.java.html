@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Classes.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Lidalia Lang</a> &gt; <a href="index.html" class="el_package">uk.org.lidalia.lang</a> &gt; <span class="el_source">Classes.java</span></div><h1>Classes.java</h1><pre class="source lang-java linenums">package uk.org.lidalia.lang;
+
+import java.lang.reflect.Constructor;
+
+/**
+ * A collection of methods that could conveniently exist on {@link Class} but don't.
+ */
+public final class Classes {
+
+    /**
+     * @return the generified compile time type of the object
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public static &lt;CompileTimeType&gt; Class&lt;? extends CompileTimeType&gt; getClass(final CompileTimeType object) {
+<span class="fc" id="L15">        return (Class&lt;? extends CompileTimeType&gt;) object.getClass();</span>
+    }
+
+    /**
+     * @return true if one and other are the same type, or one is a subtype of other, or other is a subtype of one
+     */
+    public static boolean inSameClassHierarchy(final Class&lt;?&gt; one, final Class&lt;?&gt; other) {
+<span class="fc bfc" id="L22" title="All 4 branches covered.">        return one.isAssignableFrom(other) || other.isAssignableFrom(one);</span>
+    }
+
+    /**
+     * @param type the class to check for the existence of the constructor
+     * @param parameterTypes the types of the parameters of the constructor
+     * @return true if a constructor with those types exists on the class, false otherwise
+     */
+    public static boolean hasConstructor(final Class&lt;?&gt; type, final Class&lt;?&gt;... parameterTypes) {
+        try {
+<span class="fc" id="L32">            final Constructor&lt;?&gt; constructor = type.getConstructor(parameterTypes);</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">            return constructor != null;</span>
+<span class="fc" id="L34">        } catch (NoSuchMethodException e) {</span>
+<span class="fc" id="L35">            return false;</span>
+        }
+
+    }
+
+<span class="fc" id="L40">    private Classes() {</span>
+<span class="fc" id="L41">        throw new UnsupportedOperationException(&quot;Not instantiable&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.2.201302030002</span></div></body></html>

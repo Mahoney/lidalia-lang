@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javadocOptions>
+  <docletArtifacts>
+    <docletArtifact />
+  </docletArtifacts>
+  <tagletArtifacts>
+    <tagletArtifact />
+  </tagletArtifacts>
+  <links>
+    <link>http://download.oracle.com/javase/1.7/docs/api/</link>
+    <link>http://www.slf4j.org/apidocs/</link>
+    <link>http://docs.guava-libraries.googlecode.com/git-history/v14.0.1/javadoc/</link>
+    <link>http://logback.qos.ch/apidocs/</link>
+    <link>http://junit.org/javadoc/latest/</link>
+    <link>http://hamcrest.org/JavaHamcrest/javadoc/1.3/</link>
+    <link>http://docs.oracle.com/javaee/6.0/api/</link>
+    <link>http://joda-time.sourceforge.net/apidocs/</link>
+  </links>
+  <javadocResourcesDirectory>src/main/javadoc</javadocResourcesDirectory>
+</javadocOptions>
