@@ -1,5 +1,6 @@
 package uk.org.lidalia.lang;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,7 +38,7 @@ public class ThreadLocal<T> {
         this(new Supplier<T>() {
             @Override
             public T get() {
-                return initialValue;
+                return checkNotNull(initialValue);
             }
         });
     }
@@ -79,5 +80,9 @@ public class ThreadLocal<T> {
      */
     public void reset() {
         contents.clear();
+    }
+
+    public Collection<T> allValues() {
+        return contents.values();
     }
 }

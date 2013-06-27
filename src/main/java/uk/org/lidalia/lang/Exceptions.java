@@ -24,7 +24,11 @@
 
 package uk.org.lidalia.lang;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.System.lineSeparator;
 
 /**
  * Static utility functions around Exception management.
@@ -66,6 +70,17 @@ public final class Exceptions {
     @SuppressWarnings("unchecked")
     private static <T extends Throwable> void doThrowUnchecked(final Throwable toThrow) throws T {
         throw (T) toThrow;
+    }
+
+    private static final String CAUSED_BY = "Caused by: ";
+
+    static String throwableToString(String classAndMessage, Optional<Throwable> cause) {
+        return classAndMessage+cause.transform(new Function<Throwable, String>() {
+            @Override
+            public String apply(Throwable input) {
+                return lineSeparator()+CAUSED_BY+input;
+            }
+        }).or("");
     }
 
     private Exceptions() {

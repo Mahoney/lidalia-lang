@@ -39,4 +39,23 @@ public abstract class Task implements Runnable, Callable<Void> {
      */
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public abstract void perform() throws Exception;
+
+    public static Task from(final Runnable runnable) {
+        return new Task() {
+            @Override
+            public void perform() {
+                runnable.run();
+            }
+        };
+    }
+
+    public static Task from(final Callable<Void> callable) {
+        return new Task() {
+            @Override
+            public void perform() throws Exception {
+                callable.call();
+            }
+        };
+    }
+
 }
