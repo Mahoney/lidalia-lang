@@ -27,7 +27,7 @@ public class ThreadLocalClassLoaderTests {
     private WeakReference<ClassLoader> useClassInClassLoaderAndTryToGarbageCollect(Class<? extends Runnable> threadLocalUserClass) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         ClassLoader classLoader = SimpleClassloader.make();
         WeakReference<ClassLoader> referenceToClassLoader =
-                new WeakReference<>(classLoader, new ReferenceQueue<ClassLoader>());
+                new WeakReference<ClassLoader>(classLoader, new ReferenceQueue<ClassLoader>());
 
         Runnable threadLocalUser = (Runnable) classLoader.loadClass(threadLocalUserClass.getName()).newInstance();
         threadLocalUser.run();
@@ -41,7 +41,7 @@ public class ThreadLocalClassLoaderTests {
 
     public static class JavaLangThreadLocalUser implements Runnable {
 
-        private final java.lang.ThreadLocal<Modifier> threadLocal = new java.lang.ThreadLocal<>();
+        private final java.lang.ThreadLocal<Modifier> threadLocal = new java.lang.ThreadLocal<Modifier>();
 
         @Override
         public void run() {
@@ -51,7 +51,7 @@ public class ThreadLocalClassLoaderTests {
 
     public static class LidaliaThreadLocalUser implements Runnable {
 
-        private final ThreadLocal<Modifier> threadLocal = new ThreadLocal<>(Modifier.ABSTRACT);
+        private final ThreadLocal<Modifier> threadLocal = new ThreadLocal<Modifier>(Modifier.ABSTRACT);
 
         @Override
         public void run() {

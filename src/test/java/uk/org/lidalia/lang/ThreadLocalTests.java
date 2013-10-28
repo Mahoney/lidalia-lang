@@ -31,8 +31,8 @@ public class ThreadLocalTests {
     }
 
     @Test public void resetWorksForAllThreads() throws InterruptedException {
-        final ThreadLocal<String> threadLocal = new ThreadLocal<>("Initial");
-        final AtomicReference<String> fromThread = new AtomicReference<>();
+        final ThreadLocal<String> threadLocal = new ThreadLocal<String>("Initial");
+        final AtomicReference<String> fromThread = new AtomicReference<String>();
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -67,13 +67,13 @@ public class ThreadLocalTests {
     }
 
     @Test public void initialValueSourceIsCalledSeparatelyPerThread() throws InterruptedException {
-        final ThreadLocal<String> threadLocal = new ThreadLocal<>(new Supplier<String>() {
+        final ThreadLocal<String> threadLocal = new ThreadLocal<String>(new Supplier<String>() {
             @Override
             public String get() {
                 return Thread.currentThread().getName();
             }
         });
-        final AtomicReference<String> fromThread = new AtomicReference<>();
+        final AtomicReference<String> fromThread = new AtomicReference<String>();
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -89,10 +89,10 @@ public class ThreadLocalTests {
     }
 
     @Test public void initialValueSourceIsStateful() throws InterruptedException {
-        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<>(new Supplier<AtomicReference<String>>() {
+        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<AtomicReference<String>>(new Supplier<AtomicReference<String>>() {
             @Override
             public AtomicReference<String> get() {
-                return new AtomicReference<>("initial value");
+                return new AtomicReference<String>("initial value");
             }
         });
 
@@ -102,14 +102,14 @@ public class ThreadLocalTests {
     }
 
     @Test public void initialValueSourceIsStatefulOtherThread() throws InterruptedException {
-        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<>(new Supplier<AtomicReference<String>>() {
+        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<AtomicReference<String>>(new Supplier<AtomicReference<String>>() {
             @Override
             public AtomicReference<String> get() {
-                return new AtomicReference<>("initial value");
+                return new AtomicReference<String>("initial value");
             }
         });
 
-        final AtomicReference<String> fromThread = new AtomicReference<>();
+        final AtomicReference<String> fromThread = new AtomicReference<String>();
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -126,7 +126,7 @@ public class ThreadLocalTests {
 
     @Test
     public void removeWorks() {
-        ThreadLocal<String> threadLocal = new ThreadLocal<>("Initial Value");
+        ThreadLocal<String> threadLocal = new ThreadLocal<String>("Initial Value");
         threadLocal.set("New Value");
         threadLocal.remove();
         assertThat(threadLocal.get(), is("Initial Value"));
@@ -134,13 +134,13 @@ public class ThreadLocalTests {
 
     @Test
     public void removeWorksOtherThread() throws InterruptedException {
-        final ThreadLocal<String> threadLocal = new ThreadLocal<>(new Supplier<String>() {
+        final ThreadLocal<String> threadLocal = new ThreadLocal<String>(new Supplier<String>() {
             @Override
             public String get() {
                 return Thread.currentThread().getName();
             }
         });
-        final AtomicReference<String> fromThread = new AtomicReference<>();
+        final AtomicReference<String> fromThread = new AtomicReference<String>();
 
         Thread thread = new Thread(new Runnable() {
             @Override

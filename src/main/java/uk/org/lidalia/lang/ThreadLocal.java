@@ -18,7 +18,7 @@ import static java.lang.Thread.currentThread;
  */
 public class ThreadLocal<T> {
 
-    private final Map<Thread, T> contents = new ConcurrentHashMap<>();
+    private final Map<Thread, T> contents = new ConcurrentHashMap<Thread, T>();
     private final Supplier<T> initialValueCreator;
     private final Supplier<T> threadValueInitialiser = new Supplier<T>() {
         @Override

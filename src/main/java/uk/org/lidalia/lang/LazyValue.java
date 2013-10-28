@@ -21,7 +21,7 @@ public class LazyValue<T> implements Callable<T> {
      *                 and only once
      */
     public LazyValue(final Callable<T> supplier) {
-        this.supplier = new FutureTask<>(supplier);
+        this.supplier = new FutureTask<T>(supplier);
     }
 
     /**

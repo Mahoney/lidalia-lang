@@ -5,11 +5,11 @@
   <parent>
     <groupId>uk.org.lidalia</groupId>
     <artifactId>opensource-single-module-project</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-jdk6</version>
   </parent>
 
   <artifactId>lidalia-lang</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.0-jdk6</version>
 
   <name>Lidalia Lang</name>
   <description>Additions to java.lang</description>

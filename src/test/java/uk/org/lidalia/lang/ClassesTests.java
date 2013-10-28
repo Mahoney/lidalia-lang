@@ -22,7 +22,7 @@ public class ClassesTests {
 
     @Test
     public void getClassGenerified() throws IllegalAccessException, InstantiationException {
-        final List<String> aList = new ArrayList<>();
+        final List<String> aList = new ArrayList<String>();
         final Class<? extends List<String>> aClass = Classes.getClass(aList);
         final List<String> strings = aClass.newInstance();
         assertThat(strings, is(equalTo(aList)));

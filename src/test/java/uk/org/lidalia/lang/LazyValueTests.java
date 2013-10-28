@@ -34,13 +34,13 @@ public class LazyValueTests {
     @Test
     public void returnsExpectedValue() throws Exception {
         given(supplier.call()).willReturn("expected value");
-        final LazyValue<String> lazyValue = new LazyValue<>(supplier);
+        final LazyValue<String> lazyValue = new LazyValue<String>(supplier);
         assertThat(lazyValue.call(), is("expected value"));
     }
 
     @Test
     public void supplierNotEvaluatedOnInstantiation() {
-        new LazyValue<>(supplier);
+        new LazyValue<String>(supplier);
         verifyZeroInteractions(supplier);
     }
 
@@ -51,7 +51,7 @@ public class LazyValueTests {
         final Exception actual = shouldThrow(Exception.class, new Runnable() {
             @Override
             public void run() {
-                new LazyValue<>(supplier).call();
+                new LazyValue<String>(supplier).call();
             }
         });
         assertThat(actual, is(expectedException));
@@ -59,14 +59,14 @@ public class LazyValueTests {
 
     @Test
     public void handlesInterruption() throws Exception {
-        final LazyValue<String> lazyValue = new LazyValue<>(new Callable<String>() {
+        final LazyValue<String> lazyValue = new LazyValue<String>(new Callable<String>() {
             @Override
             public String call() throws Exception {
                 Uninterruptibles.sleepUninterruptibly(200, MILLISECONDS);
                 return "result";
             }
         });
-        final AtomicReference<String> result = new AtomicReference<>();
+        final AtomicReference<String> result = new AtomicReference<String>();
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -83,12 +83,12 @@ public class LazyValueTests {
     public void threadSafeAndEvaluatedOnlyOnce() throws Exception {
         given(supplier.call()).willReturn("expected value");
 
-        final LazyValue<String> lazyValue = new LazyValue<>(supplier);
+        final LazyValue<String> lazyValue = new LazyValue<String>(supplier);
 
         final CountDownLatch start = new CountDownLatch(1);
         int runs = 100;
         final ExecutorService executor = Executors.newFixedThreadPool(runs);
-        final List<Future<String>> results = new ArrayList<>();
+        final List<Future<String>> results = new ArrayList<Future<String>>();
         for (int i = 0; i < runs; i++) {
             results.add(executor.submit(new Callable<String>() {
                 @Override
@@ -118,7 +118,7 @@ public class LazyValueTests {
     @Test
     public void toStringWhenNotYetEvaluated() throws Exception {
         given(supplier.call()).willReturn("a value");
-        final LazyValue<String> lazyValue = new LazyValue<>(supplier);
+        final LazyValue<String> lazyValue = new LazyValue<String>(supplier);
 
         assertThat(lazyValue.toString(), is("not yet evaluated"));
     }
@@ -126,7 +126,7 @@ public class LazyValueTests {
     @Test
     public void toStringWhenEvaluated() throws Exception {
         given(supplier.call()).willReturn("expected value");
-        final LazyValue<String> lazyValue = new LazyValue<>(supplier);
+        final LazyValue<String> lazyValue = new LazyValue<String>(supplier);
 
         lazyValue.call();
 

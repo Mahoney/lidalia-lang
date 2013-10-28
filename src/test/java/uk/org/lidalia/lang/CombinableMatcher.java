@@ -31,11 +31,11 @@ class CombinableMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
     }
 
     CombinableMatcher<T> and(final Matcher<? super T> other) {
-        return new CombinableMatcher<>(new AllOf<>(templatedListWith(other)));
+        return new CombinableMatcher<T>(new AllOf<T>(templatedListWith(other)));
     }
 
     private List<Matcher<? super T>> templatedListWith(final Matcher<? super T> other) {
-        final List<Matcher<? super T>> matchers = new ArrayList<>();
+        final List<Matcher<? super T>> matchers = new ArrayList<Matcher<? super T>>();
         matchers.add(matcher);
         matchers.add(other);
         return matchers;
@@ -49,6 +49,6 @@ class CombinableMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
      */
     @Factory
     static <LHS> CombinableMatcher<LHS> both(final Matcher<? super LHS> matcher) {
-        return new CombinableMatcher<>(matcher);
+        return new CombinableMatcher<LHS>(matcher);
     }
 }
