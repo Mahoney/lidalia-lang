@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>lidalia-lang</artifactId>
-  <version>1.0.0-jdk6</version>
+  <version>1.0.0-jdk6-SNAPSHOT</version>
 
   <name>Lidalia Lang</name>
   <description>Additions to java.lang</description>
