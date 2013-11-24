@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>lidalia-lang</artifactId>
-  <version>1.0.0-jdk6</version>
+  <version>1.0.0-jdk7-SNAPSHOT</version>
 
   <name>Lidalia Lang</name>
   <description>Additions to java.lang</description>
@@ -20,7 +20,7 @@
     <url>https://github.com/Mahoney/${project.artifactId}</url>
     <connection>scm:git:git@github.com:Mahoney/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:Mahoney/${project.artifactId}.git</developerConnection>
-    <tag>lidalia-lang-1.0.0-jdk6</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>
