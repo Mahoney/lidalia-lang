@@ -36,7 +36,7 @@ public class LazyValue<T> implements Callable<T> {
         try {
             return getUninterruptibly(supplier);
         } catch (ExecutionException e) {
-            return throwUnchecked(e.getCause(), null);
+            return throwUnchecked(e.getCause(), (T) null);
         }
     }
 
