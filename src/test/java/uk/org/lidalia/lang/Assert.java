@@ -63,13 +63,13 @@ final class Assert {
         return (CombinableMatcher<Class<?>>) and;
     }
 
-    private static <U, T extends U> FeatureMatcher<Class<? extends T>, Class<? extends U>> aClassWhoseSuperClass(
-            final Matcher<? extends Class<? extends U>> classMatcher) {
-        return new FeatureMatcher<Class<? extends T>, Class<? extends U>>(
+    private static FeatureMatcher<Class<?>, Class<?>> aClassWhoseSuperClass(
+            final Matcher<? extends Class<?>> classMatcher) {
+        return new FeatureMatcher<Class<?>, Class<?>>(
                 classMatcher, "a Class whose super class", "'s super class") {
             @Override @SuppressWarnings("unchecked")
-            protected Class<? extends U> featureValueOf(final Class<? extends T> actual) {
-                return (Class<? extends U>) actual.getSuperclass();
+            protected Class<?> featureValueOf(final Class<?> actual) {
+                return actual.getSuperclass();
             }
         };
     }
