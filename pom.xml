@@ -5,7 +5,7 @@
   <parent>
     <groupId>uk.org.lidalia</groupId>
     <artifactId>opensource-single-module-project</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>lidalia-lang</artifactId>
@@ -42,7 +42,7 @@
     <dependency>
       <groupId>uk.org.lidalia</groupId>
       <artifactId>standard-test-dependencies</artifactId>
-      <version>1.0.0</version>
+      <version>${parent.version}</version>
       <type>pom</type>
       <scope>test</scope>
     </dependency>
