@@ -24,8 +24,11 @@
 
 package uk.org.lidalia.lang;
 
+import java.util.concurrent.Callable;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static uk.org.lidalia.lang.Exceptions.doUnchecked;
 import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 import static uk.org.lidalia.lang.Assert.isNotInstantiable;
 import static uk.org.lidalia.lang.ShouldThrow.shouldThrow;
@@ -84,6 +87,34 @@ public class ExceptionsTests {
                 return throwUnchecked(null, null);
             }
         });
+    }
+
+    @Test
+    public void doUncheckedReturnsValueWhenSuccess() {
+        String result = doUnchecked(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return "Success";
+            }
+        });
+        assertThat(result, is("Success"));
+    }
+
+    @Test
+    public void doUncheckedThrowsUncheckedThrowable() {
+        final Exception checkedException = new Exception();
+        Exception actual = shouldThrow(Exception.class, new Runnable() {
+            @Override
+            public void run() {
+                doUnchecked(new Callable<String>() {
+                    @Override
+                    public String call() throws Exception {
+                        throw checkedException;
+                    }
+                });
+            }
+        });
+        assertThat(actual, is(checkedException));
     }
 
     @Test

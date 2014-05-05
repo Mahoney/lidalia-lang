@@ -24,6 +24,8 @@
 
 package uk.org.lidalia.lang;
 
+import java.util.concurrent.Callable;
+
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
@@ -85,5 +87,13 @@ public final class Exceptions {
 
     private Exceptions() {
         throw new UnsupportedOperationException("Not instantiable");
+    }
+
+    public static <T> T doUnchecked(Callable<T> callable) {
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            return throwUnchecked(e, null);
+        }
     }
 }
