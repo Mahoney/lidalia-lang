@@ -42,10 +42,13 @@ class CombinableMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
     }
 
     /**
+     * <p>
      * Creates a matcher that matches when both of the specified matchers match the examined object.
-     * <p/>
+     * </p>
+     * <p>
      * For example:
      * <pre>assertThat("fab", both(containsString("a")).and(containsString("b")))</pre>
+     * </p>
      */
     @Factory
     static <LHS> CombinableMatcher<LHS> both(final Matcher<? super LHS> matcher) {
