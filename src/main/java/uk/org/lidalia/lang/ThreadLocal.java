@@ -11,7 +11,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Thread.currentThread;
 
 /**
- * A ThreadLocal that has no {@link ClassLoader} leaks associated with it & does not permit null.
+ * A ThreadLocal that has no {@link ClassLoader} leaks associated with it and does not permit null.
  *
  * Values for all {@link Thread}s can be reset from any {@link Thread}.
  *
