@@ -25,7 +25,6 @@ public class LazyValue<T> implements Callable<T> {
     }
 
     /**
-     * @throws Exception thrown by the original caller, unwrapped
      * @return the result of the expression passed to the constructor; this is evaluated the first time this method is called,
      *         subsequent calls return the same result without re-evaluating it. Concurrent calls block until the first execution
      *         is complete.

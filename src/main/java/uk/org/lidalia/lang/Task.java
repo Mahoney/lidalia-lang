@@ -21,9 +21,6 @@ public abstract class Task implements Runnable, Callable<Void> {
         return null;
     }
 
-    /**
-     * @throws Exception thrown by {@link #perform()} - unchecked
-     */
     @Override
     public final void run() {
         try {
