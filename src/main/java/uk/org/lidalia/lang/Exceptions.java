@@ -51,6 +51,7 @@ public final class Exceptions {
      *         }
      *     }
      * </pre>
+     * @param <T> the return type of the calling method
      * @param toThrow The throwable that will be thrown, unwrapped and unchecked; must not be null
      * @param returnType trick to persuade the compiler that a method returns appropriately - always pass null here
      * @return Never returns, always throws the passed in exception

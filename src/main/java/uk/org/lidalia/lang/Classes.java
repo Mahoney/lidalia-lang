@@ -6,7 +6,9 @@ package uk.org.lidalia.lang;
 public final class Classes {
 
     /**
-     * @return the generified compile time type of the object
+     * @param <CompileTimeType> the compile time type of the object
+     * @param object the instance whose class should be returned
+     * @return the generified class of the object
      */
     @SuppressWarnings("unchecked")
     public static <CompileTimeType> Class<? extends CompileTimeType> getClass(final CompileTimeType object) {
@@ -14,6 +16,8 @@ public final class Classes {
     }
 
     /**
+     * @param one a type
+     * @param other another type
      * @return true if one and other are the same type, or one is a subtype of other, or other is a subtype of one
      */
     public static boolean inSameClassHierarchy(final Class<?> one, final Class<?> other) {

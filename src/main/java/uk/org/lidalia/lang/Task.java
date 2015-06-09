@@ -32,7 +32,7 @@ public abstract class Task implements Runnable, Callable<Void> {
 
     /**
      * Work of this task.
-     * @throws Exception
+     * @throws Exception if the task fails
      */
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public abstract void perform() throws Exception;
