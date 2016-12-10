@@ -40,12 +40,7 @@ public class ExceptionsTests {
     @Test
     public void throwUncheckedWithCheckedException() {
         final Exception checkedException = new Exception();
-        Exception actual = shouldThrow(Exception.class, new Runnable() {
-            @Override
-            public void run() {
-                throwUnchecked(checkedException);
-            }
-        });
+        Exception actual = shouldThrow(Exception.class, () -> throwUnchecked(checkedException));
         assertThat(actual, is(checkedException));
     }
 
@@ -67,12 +62,7 @@ public class ExceptionsTests {
 
     @Test
     public void throwUncheckedWithNull() {
-        shouldThrow(NullPointerException.class, new Runnable() {
-            @Override
-            public void run() {
-                throwUnchecked(null);
-            }
-        });
+        shouldThrow(NullPointerException.class, () -> throwUnchecked(null));
     }
 
     @Test
@@ -91,29 +81,16 @@ public class ExceptionsTests {
 
     @Test
     public void doUncheckedReturnsValueWhenSuccess() {
-        String result = doUnchecked(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                return "Success";
-            }
-        });
+        String result = doUnchecked(() -> "Success");
         assertThat(result, is("Success"));
     }
 
     @Test
     public void doUncheckedThrowsUncheckedThrowable() {
         final Exception checkedException = new Exception();
-        Exception actual = shouldThrow(Exception.class, new Runnable() {
-            @Override
-            public void run() {
-                doUnchecked(new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        throw checkedException;
-                    }
-                });
-            }
-        });
+        Exception actual = shouldThrow(Exception.class, () -> doUnchecked((Callable<String>) () -> {
+            throw checkedException;
+        }));
         assertThat(actual, is(checkedException));
     }
 

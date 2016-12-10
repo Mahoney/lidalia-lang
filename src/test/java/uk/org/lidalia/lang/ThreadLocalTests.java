@@ -4,24 +4,19 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-import com.google.common.base.Supplier;
-
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 public class ThreadLocalTests {
 
     @Test public void differentValuePerThread() throws InterruptedException {
-        final ThreadLocal<String> threadLocal = new ThreadLocal<String>("Initial");
-        final AtomicReference<String> fromThread = new AtomicReference<String>();
+        final ThreadLocal<String> threadLocal = new ThreadLocal<>("Initial");
+        final AtomicReference<String> fromThread = new AtomicReference<>();
         threadLocal.set("Thread1");
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                threadLocal.set("Thread2");
-                fromThread.set(threadLocal.get());
-            }
+        Thread thread = new Thread(() -> {
+            threadLocal.set("Thread2");
+            fromThread.set(threadLocal.get());
         });
         thread.start();
         thread.join();
@@ -34,13 +29,10 @@ public class ThreadLocalTests {
         final ThreadLocal<String> threadLocal = new ThreadLocal<>("Initial");
         final AtomicReference<String> fromThread = new AtomicReference<>();
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                threadLocal.set("Thread2");
-                threadLocal.reset();
-                fromThread.set(threadLocal.get());
-            }
+        Thread thread = new Thread(() -> {
+            threadLocal.set("Thread2");
+            threadLocal.reset();
+            fromThread.set(threadLocal.get());
         });
         thread.start();
         thread.join();
@@ -50,15 +42,10 @@ public class ThreadLocalTests {
     }
 
     @Test public void initialValueWorksForAllThreads() throws InterruptedException {
-        final ThreadLocal<String> threadLocal = new ThreadLocal<String>("Initial Value");
-        final AtomicReference<String> fromThread = new AtomicReference<String>();
+        final ThreadLocal<String> threadLocal = new ThreadLocal<>("Initial Value");
+        final AtomicReference<String> fromThread = new AtomicReference<>();
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                fromThread.set(threadLocal.get());
-            }
-        });
+        Thread thread = new Thread(() -> fromThread.set(threadLocal.get()));
         thread.start();
         thread.join();
 
@@ -67,20 +54,10 @@ public class ThreadLocalTests {
     }
 
     @Test public void initialValueSourceIsCalledSeparatelyPerThread() throws InterruptedException {
-        final ThreadLocal<String> threadLocal = new ThreadLocal<>(new Supplier<String>() {
-            @Override
-            public String get() {
-                return Thread.currentThread().getName();
-            }
-        });
+        final ThreadLocal<String> threadLocal = new ThreadLocal<>(() -> Thread.currentThread().getName());
         final AtomicReference<String> fromThread = new AtomicReference<>();
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                fromThread.set(threadLocal.get());
-            }
-        });
+        Thread thread = new Thread(() -> fromThread.set(threadLocal.get()));
         thread.start();
         thread.join();
 
@@ -89,12 +66,7 @@ public class ThreadLocalTests {
     }
 
     @Test public void initialValueSourceIsStateful() throws InterruptedException {
-        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<>(new Supplier<AtomicReference<String>>() {
-            @Override
-            public AtomicReference<String> get() {
-                return new AtomicReference<>("initial value");
-            }
-        });
+        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<>(() -> new AtomicReference<>("initial value"));
 
         threadLocal.get().set("new value");
 
@@ -102,21 +74,13 @@ public class ThreadLocalTests {
     }
 
     @Test public void initialValueSourceIsStatefulOtherThread() throws InterruptedException {
-        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<>(new Supplier<AtomicReference<String>>() {
-            @Override
-            public AtomicReference<String> get() {
-                return new AtomicReference<>("initial value");
-            }
-        });
+        final ThreadLocal<AtomicReference<String>> threadLocal = new ThreadLocal<>(() -> new AtomicReference<>("initial value"));
 
         final AtomicReference<String> fromThread = new AtomicReference<>();
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                threadLocal.get().set("new value");
-                fromThread.set(threadLocal.get().get());
-            }
+        Thread thread = new Thread(() -> {
+            threadLocal.get().set("new value");
+            fromThread.set(threadLocal.get().get());
         });
         thread.start();
         thread.join();
@@ -134,21 +98,13 @@ public class ThreadLocalTests {
 
     @Test
     public void removeWorksOtherThread() throws InterruptedException {
-        final ThreadLocal<String> threadLocal = new ThreadLocal<>(new Supplier<String>() {
-            @Override
-            public String get() {
-                return Thread.currentThread().getName();
-            }
-        });
+        final ThreadLocal<String> threadLocal = new ThreadLocal<>(() -> Thread.currentThread().getName());
         final AtomicReference<String> fromThread = new AtomicReference<>();
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                threadLocal.set("New Value");
-                threadLocal.remove();
-                fromThread.set(threadLocal.get());
-            }
+        Thread thread = new Thread(() -> {
+            threadLocal.set("New Value");
+            threadLocal.remove();
+            fromThread.set(threadLocal.get());
         });
         thread.start();
         thread.join();

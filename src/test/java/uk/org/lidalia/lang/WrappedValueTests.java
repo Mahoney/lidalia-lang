@@ -4,12 +4,9 @@ import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import com.google.common.base.Function;
+import java.util.Optional;
 
-import static com.google.common.base.Optional.fromNullable;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -100,11 +97,6 @@ public class WrappedValueTests {
     }
 
     private Integer hashCodeOf(Object actual) {
-        return fromNullable(actual).transform(new Function<Object, Integer>() {
-            @Override
-            public Integer apply(Object input) {
-                return input.hashCode();
-            }
-        }).orNull();
+        return Optional.ofNullable(actual).map(Object::hashCode).orElse(null);
     }
 }

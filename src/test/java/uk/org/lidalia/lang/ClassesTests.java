@@ -29,7 +29,7 @@ public class ClassesTests {
     }
 
     @Test
-    public void inSameClassHierarchyWhenimplementingSameInterfaceOtherwiseUnrelated() {
+    public void inSameClassHierarchyWhenImplementingSameInterfaceOtherwiseUnrelated() {
         assertThat(inSameClassHierarchy(ClassC1.class, InterfaceC.class), is(true));
         assertThat(inSameClassHierarchy(ClassC2.class, InterfaceC.class), is(true));
         assertThat(inSameClassHierarchy(ClassC1.class, ClassC2.class), is(false));

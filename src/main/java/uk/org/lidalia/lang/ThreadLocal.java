@@ -3,12 +3,11 @@ package uk.org.lidalia.lang;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
-import com.google.common.base.Supplier;
-
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Thread.currentThread;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
 /**
  * A ThreadLocal that has no {@link ClassLoader} leaks associated with it and does not permit null.
@@ -35,12 +34,7 @@ public class ThreadLocal<T> {
      *                     This should not be mutable, as it will be shared between all {@link Thread}s.
      */
     public ThreadLocal(final T initialValue) {
-        this(new Supplier<T>() {
-            @Override
-            public T get() {
-                return checkNotNull(initialValue);
-            }
-        });
+        this(() -> requireNonNull(initialValue));
     }
 
     /**
@@ -49,21 +43,21 @@ public class ThreadLocal<T> {
      *                            allowing a different initial instance per {@link Thread}.
      */
     public ThreadLocal(final Supplier<T> initialValueCreator) {
-        this.initialValueCreator = checkNotNull(initialValueCreator);
+        this.initialValueCreator = requireNonNull(initialValueCreator);
     }
 
     /**
      * @param value the new value for the calling {@link Thread} - does not affect the value for any other {@link Thread}.
      */
     public void set(final T value) {
-        contents.put(currentThread(), checkNotNull(value));
+        contents.put(currentThread(), requireNonNull(value));
     }
 
     /**
      * @return the value for the calling {@link Thread}, or the initial value if this has not been set or has been removed.
      */
     public T get() {
-        return fromNullable(contents.get(currentThread())).or(threadValueInitialiser);
+        return ofNullable(contents.get(currentThread())).orElseGet(threadValueInitialiser);
     }
 
     /**

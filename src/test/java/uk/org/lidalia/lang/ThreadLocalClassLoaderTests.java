@@ -27,7 +27,7 @@ public class ThreadLocalClassLoaderTests {
     private WeakReference<ClassLoader> useClassInClassLoaderAndTryToGarbageCollect(Class<? extends Runnable> threadLocalUserClass) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         ClassLoader classLoader = SimpleClassloader.make();
         WeakReference<ClassLoader> referenceToClassLoader =
-                new WeakReference<>(classLoader, new ReferenceQueue<ClassLoader>());
+                new WeakReference<>(classLoader, new ReferenceQueue<>());
 
         Runnable threadLocalUser = (Runnable) classLoader.loadClass(threadLocalUserClass.getName()).newInstance();
         threadLocalUser.run();

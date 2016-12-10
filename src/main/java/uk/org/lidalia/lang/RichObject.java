@@ -1,24 +1,22 @@
 package uk.org.lidalia.lang;
 
-import java.lang.reflect.Field;
-import java.security.PrivilegedAction;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 
-import static com.google.common.base.Optional.fromNullable;
+import java.lang.reflect.Field;
+import java.security.PrivilegedAction;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
+
 import static java.security.AccessController.doPrivileged;
-import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.empty;
 import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
 import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 
@@ -32,15 +30,8 @@ public abstract class RichObject {
     private static final int PRIME = 37;
     private static final int INITIAL_HASHCODE_VALUE = 17;
 
-    private static final LoadingCache<Class<?>, FluentIterable<FieldFacade>> IDENTITY_FIELDS =
+    private static final LoadingCache<Class<?>, List<FieldFacade>> IDENTITY_FIELDS =
             CacheBuilder.newBuilder().weakKeys().softValues().build(new IdentityFieldLoader());
-    private static final Joiner FIELD_JOINER = Joiner.on(",");
-    private static final Function<Object, Integer> toHashCode = new Function<Object, Integer>() {
-        @Override
-        public Integer apply(final Object fieldValue) {
-            return fieldValue.hashCode();
-        }
-    };
 
     /**
      * Implementation of equals based on fields annotated with {@link Identity}.
@@ -77,26 +68,17 @@ public abstract class RichObject {
 
         // They must have precisely the same set of identity members to meet the
         // symmetric & transitive requirement of equals
-        final FluentIterable<FieldFacade> fieldsOfThis = fields();
-        return fieldsOfThis.toSet().equals(that.fields().toSet())
-                && fieldsOfThis.allMatch(hasEqualValueIn(that));
+        final List<FieldFacade> fieldsOfThis = fields();
+        return fieldsOfThis.equals(that.fields())
+                && fieldsOfThis.stream().allMatch(field -> valueOf(field).equals(that.valueOf(field)));
     }
 
-    private FluentIterable<FieldFacade> fields() {
+    private List<FieldFacade> fields() {
         try {
             return IDENTITY_FIELDS.get(getClass());
         } catch (ExecutionException e) {
             return throwUnchecked(e.getCause(), null);
         }
-    }
-
-    private Predicate<FieldFacade> hasEqualValueIn(final RichObject other) {
-        return new Predicate<FieldFacade>() {
-            @Override
-            public boolean apply(final FieldFacade field) {
-                return valueOf(field).equals(other.valueOf(field));
-            }
-        };
     }
 
     /**
@@ -108,7 +90,7 @@ public abstract class RichObject {
     @Override public int hashCode() {
         int result = INITIAL_HASHCODE_VALUE;
         for (final FieldFacade field : fields()) {
-            final int toAdd = valueOf(field).transform(toHashCode).or(0);
+            final int toAdd = valueOf(field).map(Object::hashCode).orElse(0);
             result = PRIME * result + toAdd;
         }
         return result;
@@ -121,63 +103,32 @@ public abstract class RichObject {
      * {@link Identity}
      */
     @Override public String toString() {
-        final Iterable<String> fieldsAsStrings = fields().transform(toStringValueOfField());
-        return getClass().getSimpleName()+"["+FIELD_JOINER.join(fieldsAsStrings)+"]";
-    }
-
-    private Function<FieldFacade, String> toStringValueOfField() {
-        return new Function<FieldFacade, String>() {
-            @Override
-            public String apply(final FieldFacade field) {
-                return field.getName() + "=" + valueOf(field).or("absent");
-            }
-        };
+        final Stream<String> fieldsAsStrings = fields().stream().map(field -> field.getName() + "=" + valueOf(field).orElse("null"));
+        return getClass().getSimpleName()+"["+fieldsAsStrings.collect(joining(","))+"]";
     }
 
     private Optional<Object> valueOf(final FieldFacade field) {
         return field.valueOn(this);
     }
 
-    private static class IdentityFieldLoader extends CacheLoader<Class<?>, FluentIterable<FieldFacade>> {
+    private static class IdentityFieldLoader extends CacheLoader<Class<?>, List<FieldFacade>> {
 
         @Override
-        public FluentIterable<FieldFacade> load(final Class<?> key) {
-            return FluentIterable.from(doLoad(key));
+        public List<FieldFacade> load(final Class<?> key) {
+            return doLoad(key).collect(toList());
         }
 
-        private static final Predicate<FieldFacade> onlyIdentityFields = new Predicate<FieldFacade>() {
-            @Override
-            public boolean apply(final FieldFacade field) {
-                return field.isIdentityField();
-            }
-        };
-
-        private static final Function<Field, FieldFacade> toFieldFacade = new Function<Field, FieldFacade>() {
-            @Override
-            public FieldFacade apply(final Field field) {
-                return new FieldFacade(field);
-            }
-        };
-
-        private static final Function<Class<?>, Set<FieldFacade>> toFieldSet = new Function<Class<?>, Set<FieldFacade>>() {
-            @Override
-            public Set<FieldFacade> apply(final Class<?> input) {
-                return doLoad(input);
-            }
-        };
-
-        private static Set<FieldFacade> doLoad(final Class<?> key) {
-            final ImmutableSet<FieldFacade> localIdentityFieldSet = FluentIterable.from(asList(key.getDeclaredFields()))
-                    .transform(toFieldFacade)
-                    .filter(onlyIdentityFields)
-                    .toSet();
-            final Optional<? extends Class<?>> superClass = fromNullable(key.getSuperclass());
-            final Set<FieldFacade> superIdentityFieldSet = superClass.transform(toFieldSet).or(ImmutableSet.<FieldFacade>of());
-            return Sets.union(localIdentityFieldSet, superIdentityFieldSet);
+        private static Stream<FieldFacade> doLoad(final Class<?> key) {
+            final Stream<FieldFacade> localIdentityFieldSet = stream(key.getDeclaredFields()).map(FieldFacade::new)
+                    .filter(FieldFacade::isIdentityField);
+            final Optional<Class<?>> superClass = ofNullable(key.getSuperclass());
+            final Stream<FieldFacade> superIdentityFieldSet = superClass.map(IdentityFieldLoader::doLoad).orElse(empty());
+            return Stream.concat(localIdentityFieldSet, superIdentityFieldSet);
         }
     }
 
     private static class FieldFacade extends WrappedValue {
+
         private final Field field;
 
         FieldFacade(final Field field) {
@@ -185,32 +136,29 @@ public abstract class RichObject {
             this.field = field;
         }
 
-        public Optional<Object> valueOn(final Object target) {
+        Optional<Object> valueOn(final Object target) {
             try {
                 if (!field.isAccessible()) {
                     makeAccessible();
                 }
-                return fromNullable(field.get(target));
+                return ofNullable(field.get(target));
             } catch (IllegalAccessException e) {
                 throw new IllegalStateException(field+" was not accessible; all fields should be accessible", e);
             }
         }
 
-        public String getName() {
+        String getName() {
             return field.getName();
         }
 
-        public boolean isIdentityField() {
+        boolean isIdentityField() {
             return field.isAnnotationPresent(Identity.class);
         }
 
         private void makeAccessible() {
-            doPrivileged(new PrivilegedAction<Void>() {
-                @Override
-                public Void run() {
-                    field.setAccessible(true);
-                    return null;
-                }
+            doPrivileged((PrivilegedAction<Void>) () -> {
+                field.setAccessible(true);
+                return null;
             });
         }
     }

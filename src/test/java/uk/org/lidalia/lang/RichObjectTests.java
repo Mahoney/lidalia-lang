@@ -1,23 +1,14 @@
 package uk.org.lidalia.lang;
 
-import static com.google.common.base.Optional.fromNullable;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
+import uk.org.lidalia.lang.testclasses.*;
 
-import com.google.common.base.Function;
-
-import uk.org.lidalia.lang.testclasses.ClassA;
-import uk.org.lidalia.lang.testclasses.ClassA1;
-import uk.org.lidalia.lang.testclasses.ClassA2;
-import uk.org.lidalia.lang.testclasses.ClassB;
-import uk.org.lidalia.lang.testclasses.NoFields;
+import static java.util.Optional.ofNullable;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 public class RichObjectTests {
 
@@ -133,11 +124,6 @@ public class RichObjectTests {
     }
 
     private Integer hashCodeOf(Object actual) {
-        return fromNullable(actual).transform(new Function<Object, Integer>() {
-            @Override
-            public Integer apply(Object input) {
-                return input.hashCode();
-            }
-        }).orNull();
+        return ofNullable(actual).map(Object::hashCode).orElse(null);
     }
 }

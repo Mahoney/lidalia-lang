@@ -26,17 +26,12 @@ public class TaskTests {
     @Test public void runThrowsException() {
         final Exception exception = new Exception();
 
-        final Exception actual = shouldThrow(Exception.class, new Runnable() {
+        final Exception actual = shouldThrow(Exception.class, () -> new Task() {
             @Override
-            public void run() {
-                new Task() {
-                    @Override
-                    public void perform() throws Exception {
-                        throw exception;
-                    }
-                }.run();
+            public void perform() throws Exception {
+                throw exception;
             }
-        });
+        }.run());
         assertThat(actual, is(exception));
     }
 

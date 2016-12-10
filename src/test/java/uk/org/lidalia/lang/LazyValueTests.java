@@ -12,8 +12,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -48,31 +46,18 @@ public class LazyValueTests {
     public void throwsSourceException() throws Exception {
         final Exception expectedException = new Exception();
         given(supplier.call()).willThrow(expectedException);
-        final Exception actual = shouldThrow(Exception.class, new Runnable() {
-            @Override
-            public void run() {
-                new LazyValue<>(supplier).call();
-            }
-        });
+        final Exception actual = shouldThrow(Exception.class, () -> new LazyValue<>(supplier).call());
         assertThat(actual, is(expectedException));
     }
 
     @Test
     public void handlesInterruption() throws Exception {
-        final LazyValue<String> lazyValue = new LazyValue<>(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                Uninterruptibles.sleepUninterruptibly(200, MILLISECONDS);
-                return "result";
-            }
+        final LazyValue<String> lazyValue = new LazyValue<>(() -> {
+            Uninterruptibles.sleepUninterruptibly(200, MILLISECONDS);
+            return "result";
         });
         final AtomicReference<String> result = new AtomicReference<>();
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                result.set(lazyValue.call());
-            }
-        });
+        Thread t = new Thread(() -> result.set(lazyValue.call()));
         t.start();
         t.interrupt();
         t.join();
@@ -90,26 +75,20 @@ public class LazyValueTests {
         final ExecutorService executor = Executors.newFixedThreadPool(runs);
         final List<Future<String>> results = new ArrayList<>();
         for (int i = 0; i < runs; i++) {
-            results.add(executor.submit(new Callable<String>() {
-                @Override
-                public String call() throws Exception {
-                    start.await();
-                    return lazyValue.call();
-                }
+            results.add(executor.submit(() -> {
+                start.await();
+                return lazyValue.call();
             }));
         }
 
         start.countDown();
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.SECONDS);
-        assertThat(Iterables.all(results, new Predicate<Future<String>>() {
-            @Override
-            public boolean apply(Future<String> input) {
-                try {
-                    return input.get().equals("expected value");
-                } catch (Exception e) {
-                    return false;
-                }
+        assertThat(results.stream().allMatch(input -> {
+            try {
+                return input.get().equals("expected value");
+            } catch (Exception e) {
+                return false;
             }
         }), is(true));
         verify(supplier, times(1)).call();

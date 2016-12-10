@@ -22,8 +22,8 @@ final class Assert {
         return CombinableMatcher.both(aClassWhoseSuperClass(is(equalTo(Object.class))))
                 .and(aClassWhoseSetOfConstructors(CombinableMatcher.both(
                         is(Assert.<List<Constructor<?>>>aCollectionWhoseLength(is(1))))
-                        .and(is(Assert.<List<Constructor<?>>, Constructor<?>>aListWhoseElementAtIndex(0, CombinableMatcher.both(
-                                is(aConstructorWhoseParameterTypes(is(Assert.<List<Class<?>>>aCollectionWhoseLength(is(0))))))
+                        .and(is(Assert.aListWhoseElementAtIndex(0, CombinableMatcher.both(
+                                is(aConstructorWhoseParameterTypes(is(Assert.aCollectionWhoseLength(is(0))))))
                                 .and(isAMemberWithModifier(Modifier.PRIVATE))
                                 .and(aConstructorWhoseThrownException(CombinableMatcher.both(
                                         isA(UnsupportedOperationException.class))

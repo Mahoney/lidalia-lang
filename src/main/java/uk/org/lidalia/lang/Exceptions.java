@@ -26,11 +26,7 @@ package uk.org.lidalia.lang;
 
 import java.util.concurrent.Callable;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.System.lineSeparator;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Static utility functions around Exception management.
@@ -58,7 +54,7 @@ public final class Exceptions {
      * @throws NullPointerException if toThrow is null
      */
     public static <T> T throwUnchecked(final Throwable toThrow, final T returnType) {
-        Exceptions.<RuntimeException>doThrowUnchecked(checkNotNull(toThrow));
+        Exceptions.doThrowUnchecked(requireNonNull(toThrow));
         throw new AssertionError("This code should be unreachable. Something went terribly wrong here!");
     }
 
@@ -76,15 +72,6 @@ public final class Exceptions {
     }
 
     private static final String CAUSED_BY = "Caused by: ";
-
-    static String throwableToString(String classAndMessage, Optional<Throwable> cause) {
-        return classAndMessage+cause.transform(new Function<Throwable, String>() {
-            @Override
-            public String apply(Throwable input) {
-                return lineSeparator()+CAUSED_BY+input;
-            }
-        }).or("");
-    }
 
     private Exceptions() {
         throw new UnsupportedOperationException("Not instantiable");

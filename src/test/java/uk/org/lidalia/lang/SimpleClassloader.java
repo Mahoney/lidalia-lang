@@ -36,11 +36,7 @@ class SimpleClassloader extends ClassLoader {
     }
 
     static SimpleClassloader make(final ClassLoader parent) {
-        return AccessController.doPrivileged(new PrivilegedAction<SimpleClassloader>() {
-            public SimpleClassloader run() {
-                return new SimpleClassloader(parent);
-            }
-        });
+        return AccessController.doPrivileged((PrivilegedAction<SimpleClassloader>) () -> new SimpleClassloader(parent));
     }
 
 }
