@@ -1,4 +1,4 @@
-Lidalia Lang
+Lidalia Lang [![Build Status](https://travis-ci.org/Mahoney/lidalia-lang.svg?branch=master)](https://travis-ci.org/Mahoney/lidalia-lang)
 ============
 
 See http://projects.lidalia.org.uk/lidalia-lang for details.
