@@ -4,7 +4,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+import static uk.org.lidalia.lang.Uninterruptibles.getUninterruptibly;
 import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 
 /**

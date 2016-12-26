@@ -1,28 +1,21 @@
 package uk.org.lidalia.lang;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.Test;
 
-import com.google.common.util.concurrent.Uninterruptibles;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 import static uk.org.lidalia.lang.ShouldThrow.shouldThrow;
+import static uk.org.lidalia.lang.Uninterruptibles.sleepUninterruptibly;
 
 public class LazyValueTests {
 
@@ -31,8 +24,9 @@ public class LazyValueTests {
 
     @Test
     public void returnsExpectedValue() throws Exception {
-        given(supplier.call()).willReturn("expected value");
-        final LazyValue<String> lazyValue = new LazyValue<>(supplier);
+
+        final LazyValue<String> lazyValue = new LazyValue<>(() -> "expected value");
+
         assertThat(lazyValue.call(), is("expected value"));
     }
 
@@ -44,53 +38,46 @@ public class LazyValueTests {
 
     @Test
     public void throwsSourceException() throws Exception {
+
         final Exception expectedException = new Exception();
-        given(supplier.call()).willThrow(expectedException);
-        final Exception actual = shouldThrow(Exception.class, () -> new LazyValue<>(supplier).call());
+
+        final Exception actual = shouldThrow(Exception.class, () ->
+                new LazyValue<>(() -> {
+                    throw expectedException;
+                }).call()
+        );
+
         assertThat(actual, is(expectedException));
     }
 
     @Test
     public void handlesInterruption() throws Exception {
         final LazyValue<String> lazyValue = new LazyValue<>(() -> {
-            Uninterruptibles.sleepUninterruptibly(200, MILLISECONDS);
+            sleepUninterruptibly(200, MILLISECONDS);
             return "result";
         });
         final AtomicReference<String> result = new AtomicReference<>();
-        Thread t = new Thread(() -> result.set(lazyValue.call()));
+        final AtomicReference<Boolean> interrupted = new AtomicReference<>(false);
+        Thread t = new Thread(() -> {
+                result.set(lazyValue.call());
+                interrupted.set(Thread.currentThread().isInterrupted());
+        }, "test-thread");
         t.start();
         t.interrupt();
         t.join();
         assertThat(result.get(), is("result"));
+        assertThat(interrupted.get(), is(true));
     }
 
     @Test
     public void threadSafeAndEvaluatedOnlyOnce() throws Exception {
+
         given(supplier.call()).willReturn("expected value");
 
-        final LazyValue<String> lazyValue = new LazyValue<>(supplier);
+        final List<String> results = concurrently(100, new LazyValue<>(supplier));
 
-        final CountDownLatch start = new CountDownLatch(1);
-        int runs = 100;
-        final ExecutorService executor = Executors.newFixedThreadPool(runs);
-        final List<Future<String>> results = new ArrayList<>();
-        for (int i = 0; i < runs; i++) {
-            results.add(executor.submit(() -> {
-                start.await();
-                return lazyValue.call();
-            }));
-        }
+        assertThat(results, everyItem(is("expected value")));
 
-        start.countDown();
-        executor.shutdown();
-        executor.awaitTermination(1, TimeUnit.SECONDS);
-        assertThat(results.stream().allMatch(input -> {
-            try {
-                return input.get().equals("expected value");
-            } catch (Exception e) {
-                return false;
-            }
-        }), is(true));
         verify(supplier, times(1)).call();
     }
 
@@ -110,5 +97,26 @@ public class LazyValueTests {
         lazyValue.call();
 
         assertThat(lazyValue.toString(), is("expected value"));
+    }
+
+    private static <T> List<T> concurrently(int runs, Callable<T> work) throws InterruptedException {
+        final CountDownLatch start = new CountDownLatch(1);
+        final ExecutorService executor = Executors.newFixedThreadPool(runs);
+        final List<Future<T>> results = new ArrayList<>();
+
+
+        for (int i = 0; i < runs; i++) {
+
+            results.add(executor.submit(() ->{
+                start.await();
+                return work.call();
+            }));
+        }
+
+        start.countDown();
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.SECONDS);
+
+        return results.stream().map(Uninterruptibles::getUnchecked).collect(Collectors.toList());
     }
 }

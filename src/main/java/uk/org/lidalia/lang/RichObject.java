@@ -1,14 +1,9 @@
 package uk.org.lidalia.lang;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 import java.lang.reflect.Field;
 import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 import static java.security.AccessController.doPrivileged;
@@ -18,7 +13,6 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.empty;
 import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
-import static uk.org.lidalia.lang.Exceptions.throwUnchecked;
 
 /**
  * A class that provides implementations of {@link #equals(Object)}, {@link #hashCode()} and {@link #toString()} for its subtypes.
@@ -31,7 +25,7 @@ public abstract class RichObject {
     private static final int INITIAL_HASHCODE_VALUE = 17;
 
     private static final LoadingCache<Class<?>, List<FieldFacade>> IDENTITY_FIELDS =
-            CacheBuilder.newBuilder().weakKeys().softValues().build(new IdentityFieldLoader());
+            new LocalCache.LocalLoadingCache<>(new IdentityFieldLoader());
 
     /**
      * Implementation of equals based on fields annotated with {@link Identity}.
@@ -74,11 +68,7 @@ public abstract class RichObject {
     }
 
     private List<FieldFacade> fields() {
-        try {
-            return IDENTITY_FIELDS.get(getClass());
-        } catch (ExecutionException e) {
-            return throwUnchecked(e.getCause(), null);
-        }
+        return IDENTITY_FIELDS.getUnchecked(getClass());
     }
 
     /**
@@ -111,7 +101,7 @@ public abstract class RichObject {
         return field.valueOn(this);
     }
 
-    private static class IdentityFieldLoader extends CacheLoader<Class<?>, List<FieldFacade>> {
+    private static class IdentityFieldLoader implements CacheLoader<Class<?>, List<FieldFacade>> {
 
         @Override
         public List<FieldFacade> load(final Class<?> key) {

@@ -1,6 +1,6 @@
 package uk.org.lidalia.lang;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 import static uk.org.lidalia.lang.Classes.inSameClassHierarchy;
 
 /**
@@ -15,7 +15,7 @@ public abstract class WrappedValue {
     private final Object wrapped;
 
     protected WrappedValue(final Object wrapped) {
-        this.wrapped = checkNotNull(wrapped);
+        this.wrapped = requireNonNull(wrapped);
     }
 
     /**
