@@ -19,6 +19,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.locks.ReentrantLock;
@@ -786,7 +787,7 @@ class LocalCache<K, V> {
         LoadingValueReference<K, V> loadingValueReference,
         CacheLoader<? super K, V> loader)
         throws ExecutionException {
-      ListenableFuture<V> loadingFuture = loadingValueReference.loadFuture(key, loader);
+      Future<V> loadingFuture = loadingValueReference.loadFuture(key, loader);
       return getAndRecordStats(key, hash, loadingValueReference, loadingFuture);
     }
 
@@ -797,7 +798,7 @@ class LocalCache<K, V> {
         K key,
         int hash,
         LoadingValueReference<K, V> loadingValueReference,
-        ListenableFuture<V> newValue)
+        Future<V> newValue)
         throws ExecutionException {
       V value = null;
       try {
@@ -1220,10 +1221,6 @@ class LocalCache<K, V> {
       return futureValue.setException(t);
     }
 
-    private ListenableFuture<V> fullyFailedFuture(Throwable t) {
-      return Futures.immediateFailedFuture(t);
-    }
-
     @Override
     public void notifyNewValue(V newValue) {
       if (newValue != null) {
@@ -1236,27 +1233,12 @@ class LocalCache<K, V> {
       }
     }
 
-    ListenableFuture<V> loadFuture(K key, CacheLoader<? super K, V> loader) {
+    Future<V> loadFuture(K key, CacheLoader<? super K, V> loader) {
       try {
-        V previousValue = oldValue.get();
-        if (previousValue == null) {
-          V newValue = loader.load(key);
-          return set(newValue) ? futureValue : Futures.immediateFuture(newValue);
-        }
-        ListenableFuture<V> newValue = Futures.immediateFuture(loader.load(key));
-        if (newValue == null) {
-          return Futures.immediateFuture(null);
-        }
-        // To avoid a race, make sure the refreshed value is set into loadingValueReference
-        // *before* returning newValue from the cache query.
-        return Futures.transform(
-            newValue,
-                newValue1 -> {
-                  LoadingValueReference.this.set(newValue1);
-                  return newValue1;
-                });
+        V newValue = loader.load(key);
+        return set(newValue) ? futureValue : new ImmediateFuture.ImmediateSuccessfulFuture<>(newValue);
       } catch (Throwable t) {
-          return setException(t) ? futureValue : fullyFailedFuture(t);
+        return setException(t) ? futureValue : new ImmediateFuture.ImmediateFailedFuture<>(t);
       }
     }
 
@@ -1286,12 +1268,12 @@ class LocalCache<K, V> {
     }
   }
 
-  private V get(K key, CacheLoader<? super K, V> loader) throws ExecutionException {
+  private V get(K key, CacheLoader<? super K, V> loader) {
     int hash = hash(requireNonNull(key));
     return segmentFor(hash).get(key, hash, loader);
   }
 
-  V getOrLoad(K key) throws ExecutionException {
+  V getOrLoad(K key) {
     return get(key, defaultLoader);
   }
 

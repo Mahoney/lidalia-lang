@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.atomic.AtomicReferenceFieldUpdater.newUpdater;
 
-abstract class AbstractFuture<V> implements ListenableFuture<V> {
+abstract class AbstractFuture<V> implements Future<V> {
   // NOTE: Whenever both tests are cheap and functional, it's faster to use &, | instead of &&, ||
 
   private static final boolean GENERATE_CANCELLATION_CAUSES =
@@ -60,11 +60,6 @@ abstract class AbstractFuture<V> implements ListenableFuture<V> {
     @Override
     public final boolean isCancelled() {
       return super.isCancelled();
-    }
-
-    @Override
-    public final void addListener(Runnable listener, Executor executor) {
-      super.addListener(listener, executor);
     }
 
     @Override
@@ -428,42 +423,6 @@ abstract class AbstractFuture<V> implements ListenableFuture<V> {
     return rValue;
   }
 
-  /**
-   * Returns true if this future was cancelled with {@code mayInterruptIfRunning} set to {@code
-   * true}.
-   *
-   * @since 14.0
-   */
-  private boolean wasInterrupted() {
-    final Object localValue = value;
-    return (localValue instanceof Cancellation) && ((Cancellation) localValue).wasInterrupted;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 10.0
-   */
-  @Override
-  public void addListener(Runnable listener, Executor executor) {
-    requireNonNull(listener, "Runnable was null.");
-    requireNonNull(executor, "Executor was null.");
-    Listener oldHead = listeners;
-    if (oldHead != Listener.TOMBSTONE) {
-      Listener newNode = new Listener(listener, executor);
-      do {
-        newNode.next = oldHead;
-        if (ATOMIC_HELPER.casListeners(this, oldHead, newNode)) {
-          return;
-        }
-        oldHead = listeners; // re-read
-      } while (oldHead != Listener.TOMBSTONE);
-    }
-    // If we get here then the Listener TOMBSTONE was set, which means the future is done, call
-    // the listener.
-    executeListener(listener, executor);
-  }
-
   boolean set(V value) {
     Object valueToSet = value == null ? NULL : value;
     if (ATOMIC_HELPER.casValue(this, null, valueToSet)) {
@@ -490,7 +449,6 @@ abstract class AbstractFuture<V> implements ListenableFuture<V> {
     // structure for them.
     // afterDone() should be generally fast and only used for cleanup work... but in theory can
     // also be recursive and create StackOverflowErrors
-    future.afterDone();
     // push the current set of listeners onto next
     Listener next = future.clearListeners();
     while (next != null) {
@@ -501,30 +459,6 @@ abstract class AbstractFuture<V> implements ListenableFuture<V> {
       executeListener(task, curr.executor);
     }
 
-  }
-
-  /**
-   * Callback method that is called exactly once after the future is completed.
-   *
-   * <p>The default implementation of this method in {@code AbstractFuture} does nothing.  This is
-   * intended for very lightweight cleanup work, for example, timing statistics or clearing fields.
-   * If your task does anything heavier consider, just using a listener with an executor.
-   *
-   * @since 20.0
-   */
-  void afterDone() {}
-
-  /**
-   * If this future has been cancelled (and possibly interrupted), cancels (and possibly interrupts)
-   * the given future (if available).
-   *
-   * <p>This method should be used only when this future is completed. It is designed to be called
-   * from {@code done}.
-   */
-  final void maybePropagateCancellation(Future<?> related) {
-    if (related != null & isCancelled()) {
-      related.cancel(wasInterrupted());
-    }
   }
 
   /** Releases all threads in the {@link #waiters} list, and clears the list. */

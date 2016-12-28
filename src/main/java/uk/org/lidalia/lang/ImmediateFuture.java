@@ -17,34 +17,15 @@ package uk.org.lidalia.lang;
 import uk.org.lidalia.lang.AbstractFuture.TrustedFuture;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
 
 /**
  * Implementations of {@code Futures.immediate*}.
  */
-abstract class ImmediateFuture<V> implements ListenableFuture<V> {
-  private static final Logger log = Logger.getLogger(ImmediateFuture.class.getName());
-
-  @Override
-  public void addListener(Runnable listener, Executor executor) {
-    requireNonNull(listener, "Runnable was null.");
-    requireNonNull(executor, "Executor was null.");
-    try {
-      executor.execute(listener);
-    } catch (RuntimeException e) {
-      // ListenableFuture's contract is that it will not throw unchecked exceptions, so log the bad
-      // runnable and/or executor and swallow it.
-      log.log(
-          Level.SEVERE,
-          "RuntimeException while executing runnable " + listener + " with executor " + executor,
-          e);
-    }
-  }
+abstract class ImmediateFuture<V> implements Future<V> {
 
   @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
@@ -71,8 +52,6 @@ abstract class ImmediateFuture<V> implements ListenableFuture<V> {
   }
 
   static class ImmediateSuccessfulFuture<V> extends ImmediateFuture<V> {
-    static final ImmediateFuture.ImmediateSuccessfulFuture<Object> NULL =
-            new ImmediateFuture.ImmediateSuccessfulFuture<>(null);
     private final V value;
 
     ImmediateSuccessfulFuture(V value) {
